@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="App Bazaar Studio — an independent software studio building focused mobile and desktop products for business, productivity, and everyday life." />
+  <meta name="theme-color" content="#F4F4F2" />
+  <title>App Bazaar Studio</title>
+  <link rel="canonical" href="https://appbazaarstudio.com/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #F4F4F2;
+      --surface: #FFFFFF;
+      --text: #111111;
+      --muted: #6B6B6B;
+      --line: #E4E4E0;
+      --ink: #1A2B3C;
+      --ink-hover: #2F4558;
+      --mist: #ECEEEF;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+    img { display: block; max-width: 100%; }
+
+    .wrap {
+      width: min(1120px, calc(100% - 2.5rem));
+      margin-inline: auto;
+    }
+
+    /* Header */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(244, 244, 242, 0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.3s ease, background 0.3s ease;
+    }
+    .site-header.scrolled { border-color: var(--line); }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      height: 68px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .monogram {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--ink);
+      display: grid;
+      place-items: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.68rem;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+      background: var(--surface);
+    }
+    .brand-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: -0.02em;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      border-radius: 999px;
+      padding: 0.7rem 1.15rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-ink {
+      background: var(--ink);
+      color: #fff;
+    }
+    .btn-ink:hover { background: var(--ink-hover); }
+    .btn-ghost {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      color: var(--text);
+      min-width: 84px;
+    }
+    .btn-ghost:hover { border-color: var(--ink); }
+
+    /* Hero — one composition */
+    .hero {
+      position: relative;
+      min-height: calc(100vh - 68px);
+      min-height: calc(100dvh - 68px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .hero-visual {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 60% at 70% 45%, rgba(26, 43, 60, 0.06), transparent 55%),
+        linear-gradient(180deg, var(--bg) 0%, var(--mist) 100%);
+    }
+    #wire {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.55;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: clamp(2rem, 8vh, 5rem) 0 clamp(2.5rem, 7vh, 4rem);
+    }
+    .hero-brand {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2.4rem, 7vw, 4.6rem);
+      letter-spacing: -0.04em;
+      line-height: 0.95;
+      max-width: 12ch;
+      opacity: 0;
+      transform: translateY(18px);
+      animation: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards;
+    }
+    .hero-line {
+      margin-top: 1.35rem;
+      font-size: clamp(1.05rem, 2.4vw, 1.35rem);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      max-width: 28ch;
+      opacity: 0;
+      transform: translateY(18px);
+      animation: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.35s forwards;
+    }
+    .hero-sub {
+      margin-top: 0.85rem;
+      color: var(--muted);
+      font-size: 0.98rem;
+      max-width: 38ch;
+      opacity: 0;
+      transform: translateY(18px);
+      animation: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.5s forwards;
+    }
+    .hero-cta {
+      margin-top: 1.75rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      opacity: 0;
+      transform: translateY(18px);
+      animation: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.65s forwards;
+    }
+    @keyframes rise {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Sections */
+    section { padding: clamp(3.5rem, 9vw, 6.5rem) 0; }
+    .section-kicker {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: clamp(1.7rem, 4vw, 2.4rem);
+      letter-spacing: -0.03em;
+      max-width: 16ch;
+    }
+    .section-lead {
+      margin-top: 0.85rem;
+      color: var(--muted);
+      max-width: 42ch;
+      font-size: 1rem;
+    }
+
+    .projects-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: end;
+      justify-content: space-between;
+      gap: 1.5rem;
+      margin-bottom: 2.25rem;
+    }
+
+    .project-list {
+      display: grid;
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .project {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      background: var(--surface);
+      padding: 1.4rem 1.35rem;
+      transition: background 0.3s ease;
+    }
+    .project:hover { background: #FAFAF8; }
+    @media (min-width: 720px) {
+      .project {
+        grid-template-columns: 140px 1fr auto;
+        align-items: center;
+        padding: 1.55rem 1.75rem;
+      }
+    }
+    .project-tag {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .project h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+      margin-top: 0.25rem;
+    }
+    .project p {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-top: 0.35rem;
+      max-width: 42ch;
+    }
+    .project-go {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .project-go span {
+      transition: transform 0.25s ease;
+    }
+    .project:hover .project-go span { transform: translateX(4px); }
+    .project.is-soon {
+      opacity: 0.72;
+      pointer-events: none;
+    }
+
+    .about-band {
+      background: var(--ink);
+      color: #F7F7F5;
+    }
+    .about-band .section-kicker { color: rgba(247, 247, 245, 0.55); }
+    .about-grid {
+      display: grid;
+      gap: 2rem;
+    }
+    @media (min-width: 800px) {
+      .about-grid {
+        grid-template-columns: 1.1fr 1fr;
+        align-items: end;
+        gap: 3rem;
+      }
+    }
+    .about-band .section-title { color: #fff; max-width: 14ch; }
+    .about-copy {
+      color: rgba(247, 247, 245, 0.72);
+      font-size: 1.05rem;
+      max-width: 36ch;
+    }
+    .pillars {
+      display: grid;
+      gap: 1.25rem;
+      margin-top: 2rem;
+    }
+    @media (min-width: 700px) {
+      .pillars { grid-template-columns: repeat(3, 1fr); }
+    }
+    .pillar h4 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.45rem;
+    }
+    .pillar p {
+      color: rgba(247, 247, 245, 0.55);
+      font-size: 0.9rem;
+    }
+
+    .contact-block {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      border-radius: 4px;
+      padding: clamp(1.5rem, 4vw, 2.25rem);
+    }
+    .contact-block h2 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: clamp(1.4rem, 3vw, 1.9rem);
+      letter-spacing: -0.03em;
+    }
+    .contact-block p {
+      margin-top: 0.4rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 2.5rem 0 3rem;
+    }
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: space-between;
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem 1.5rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .footer-links a:hover { color: var(--ink); }
+    .footer-copy {
+      margin-top: 1.75rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* Menu drawer */
+    .overlay {
+      position: fixed; inset: 0; z-index: 80;
+      background: rgba(17, 17, 17, 0.28);
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .overlay.open { opacity: 1; visibility: visible; }
+    .drawer {
+      position: fixed; top: 0; right: 0; z-index: 90;
+      width: min(340px, 88vw); height: 100%;
+      background: var(--surface);
+      border-left: 1px solid var(--line);
+      padding: 1.5rem;
+      transform: translateX(105%);
+      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer a {
+      display: block;
+      padding: 0.95rem 0;
+      border-bottom: 1px solid var(--line);
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    .drawer a:hover { color: var(--ink); }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+      .hero-brand, .hero-line, .hero-sub, .hero-cta {
+        opacity: 1; transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header" id="header">
+    <div class="wrap header-inner">
+      <a class="brand" href="#top" aria-label="App Bazaar Studio home">
+        <span class="monogram" aria-hidden="true">ABS</span>
+        <span class="brand-name">App Bazaar Studio</span>
+      </a>
+      <div class="header-actions">
+        <a class="btn btn-ink" href="contact.html">Start a Project</a>
+        <button class="btn btn-ghost" type="button" id="menuBtn" aria-label="Open menu">Menu</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="overlay" id="overlay" hidden></div>
+  <aside class="drawer" id="drawer" aria-label="Site menu" hidden>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+      <span class="monogram">ABS</span>
+      <button type="button" id="closeMenu" class="btn btn-ghost" style="min-width:auto;padding:0.55rem 0.9rem;">Close</button>
+    </div>
+    <a href="#projects" data-close>Projects</a>
+    <a href="#about" data-close>Studio</a>
+    <a href="about.html" data-close>About</a>
+    <a href="contact.html" data-close>Contact</a>
+    <a href="privacy-policy.html" data-close>Privacy</a>
+    <a href="terms.html" data-close>Terms</a>
+  </aside>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-visual" aria-hidden="true">
+        <canvas id="wire"></canvas>
+      </div>
+      <div class="wrap hero-content">
+        <h1 class="hero-brand">App Bazaar Studio</h1>
+        <p class="hero-line">Software built to endure.</p>
+        <p class="hero-sub">An independent studio crafting focused mobile and desktop products — clear, reliable, and ready for the long run.</p>
+        <div class="hero-cta">
+          <a class="btn btn-ink" href="#projects">View projects</a>
+          <a class="btn btn-ghost" href="contact.html">Start a project</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects">
+      <div class="wrap">
+        <div class="projects-head">
+          <div>
+            <p class="section-kicker">Portfolio</p>
+            <h2 class="section-title">Selected work</h2>
+            <p class="section-lead">Products shipping now — and space for what comes next.</p>
+          </div>
+        </div>
+
+        <div class="project-list">
+          <a class="project" href="asankarobar.html">
+            <span class="project-tag">Business</span>
+            <div>
+              <h3>Asan Karobar</h3>
+              <p>Billing, parties, inventory, and books for small commerce — mobile and desktop.</p>
+            </div>
+            <span class="project-go">View <span aria-hidden="true">→</span></span>
+          </a>
+
+          <a class="project" href="deen360.html">
+            <span class="project-tag">Lifestyle</span>
+            <div>
+              <h3>Deen360</h3>
+              <p>A calm Islamic companion for prayer, Quran, and daily practice.</p>
+            </div>
+            <span class="project-go">View <span aria-hidden="true">→</span></span>
+          </a>
+
+          <div class="project is-soon" aria-disabled="true">
+            <span class="project-tag">Upcoming</span>
+            <div>
+              <h3>Future release</h3>
+              <p>Next studio product — details soon.</p>
+            </div>
+            <span class="project-go">Soon</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-band" id="about">
+      <div class="wrap about-grid">
+        <div>
+          <p class="section-kicker">Studio</p>
+          <h2 class="section-title">Built as a brand, not a one-off app site.</h2>
+        </div>
+        <p class="about-copy">
+          App Bazaar Studio is the home for every product we ship. One mark, one standard —
+          precise engineering, cross-platform care, and privacy treated as a feature.
+        </p>
+      </div>
+      <div class="wrap pillars">
+        <article class="pillar">
+          <h4>Precision</h4>
+          <p>Interfaces refined for clarity and speed — from ledgers to daily tools.</p>
+        </article>
+        <article class="pillar">
+          <h4>Platform</h4>
+          <p>Mobile and desktop as one coherent product family.</p>
+        </article>
+        <article class="pillar">
+          <h4>Privacy</h4>
+          <p>Transparent policies. Official contact only through our channel.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="wrap">
+        <div class="contact-block">
+          <div>
+            <h2>Have a project in mind?</h2>
+            <p>Tell us what you’re building — we’ll respond from the studio inbox.</p>
+          </div>
+          <a class="btn btn-ink" href="contact.html">Contact studio</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div class="footer-inner">
+        <div class="brand">
+          <span class="monogram">ABS</span>
+          <span class="brand-name">App Bazaar Studio</span>
+        </div>
+        <nav class="footer-links" aria-label="Footer">
+          <a href="about.html">About</a>
+          <a href="contact.html">Contact</a>
+          <a href="privacy-policy.html">Privacy</a>
+          <a href="terms.html">Terms</a>
+          <a href="asankarobar-privacy.html">Asan Karobar Privacy</a>
+          <a href="deen360-privacy.html">Deen360 Privacy</a>
+        </nav>
+      </div>
+      <p class="footer-copy">© 2026 App Bazaar Studio · appbazaarstudio.com</p>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const header = document.getElementById('header');
+      const overlay = document.getElementById('overlay');
+      const drawer = document.getElementById('drawer');
+      const menuBtn = document.getElementById('menuBtn');
+      const closeMenu = document.getElementById('closeMenu');
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function setOpen(open) {
+        overlay.hidden = !open;
+        drawer.hidden = !open;
+        requestAnimationFrame(function () {
+          overlay.classList.toggle('open', open);
+          drawer.classList.toggle('open', open);
+        });
+        document.body.style.overflow = open ? 'hidden' : '';
+      }
+      menuBtn.addEventListener('click', function () { setOpen(true); });
+      closeMenu.addEventListener('click', function () { setOpen(false); });
+      overlay.addEventListener('click', function () { setOpen(false); });
+      drawer.querySelectorAll('[data-close]').forEach(function (a) {
+        a.addEventListener('click', function () { setOpen(false); });
+      });
+
+      window.addEventListener('scroll', function () {
+        header.classList.toggle('scrolled', window.scrollY > 8);
+      }, { passive: true });
+
+      // Soft wireframe field — studio atmosphere, not a product logo.
+      const canvas = document.getElementById('wire');
+      if (!canvas || reduce) return;
+      const ctx = canvas.getContext('2d');
+      let w, h, points, raf;
+
+      function resize() {
+        w = canvas.width = canvas.offsetWidth * devicePixelRatio;
+        h = canvas.height = canvas.offsetHeight * devicePixelRatio;
+        ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+        const cols = 14;
+        const rows = 10;
+        points = [];
+        for (let y = 0; y <= rows; y++) {
+          for (let x = 0; x <= cols; x++) {
+            points.push({
+              x: (x / cols) * canvas.offsetWidth * 0.92 + canvas.offsetWidth * 0.04,
+              y: (y / rows) * canvas.offsetHeight * 0.7 + canvas.offsetHeight * 0.12,
+              ox: x,
+              oy: y,
+            });
+          }
+        }
+      }
+
+      function draw(t) {
+        ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
+        ctx.strokeStyle = 'rgba(26, 43, 60, 0.16)';
+        ctx.fillStyle = 'rgba(26, 43, 60, 0.35)';
+        ctx.lineWidth = 1;
+        const cols = 15;
+        for (let i = 0; i < points.length; i++) {
+          const p = points[i];
+          const wave = Math.sin(t * 0.0006 + p.ox * 0.45 + p.oy * 0.35) * 6;
+          const px = p.x;
+          const py = p.y + wave;
+          ctx.beginPath();
+          ctx.arc(px, py, 1.2, 0, Math.PI * 2);
+          ctx.fill();
+          if ((i + 1) % cols !== 0 && i + 1 < points.length) {
+            const n = points[i + 1];
+            const ny = n.y + Math.sin(t * 0.0006 + n.ox * 0.45 + n.oy * 0.35) * 6;
+            ctx.beginPath();
+            ctx.moveTo(px, py);
+            ctx.lineTo(n.x, ny);
+            ctx.stroke();
+          }
+          if (i + cols < points.length) {
+            const n = points[i + cols];
+            const ny = n.y + Math.sin(t * 0.0006 + n.ox * 0.45 + n.oy * 0.35) * 6;
+            ctx.beginPath();
+            ctx.moveTo(px, py);
+            ctx.lineTo(n.x, ny);
+            ctx.stroke();
+          }
+        }
+        raf = requestAnimationFrame(draw);
+      }
+
+      resize();
+      window.addEventListener('resize', resize);
+      raf = requestAnimationFrame(draw);
+    })();
+  </script>
+</body>
+</html>

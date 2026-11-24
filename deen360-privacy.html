@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="App Bazaar Studio is an independent software development studio creating smart, reliable, and cross-platform mobile and desktop applications for modern business accounting, daily productivity, and digital lifestyle." />
+  <meta name="theme-color" content="#F7F3EC" />
+  <title>Deen360 Privacy — App Bazaar Studio</title>
+  <link rel="canonical" href="https://appbazaarstudio.com/deen360-privacy.html" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { navy: '#F7F3EC', champagne: '#C9A227', champagneDim: '#B8962E', ivory: '#F7F3EC', charcoal: '#1A1A1A', ink: '#2C2C2C' },
+          fontFamily: { display: ['Cinzel', 'serif'], sans: ['Plus Jakarta Sans', 'sans-serif'] },
+        },
+      },
+    };
+  </script>
+  <style>
+    :root { --ivory: #F7F3EC;
+      --charcoal: #1A1A1A; --champagne: #C9A227; }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: #F7F3EC; color: #1A1A1A; overflow-x: hidden; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #EFE8DC; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #D4AF37, #C9A227); border-radius: 999px; }
+    * { scrollbar-width: thin; scrollbar-color: #C9A227 #EFE8DC; }
+    .font-display { font-family: 'Cinzel', serif; }
+    header.site-header { backdrop-filter: blur(16px); background: rgba(247, 243, 236, 0.9); border-bottom: 1px solid rgba(212,175,55,0.12); }
+    .monogram {
+      width: 42px; height: 42px; border: 1px solid rgba(212,175,55,0.55);
+      display: grid; place-items: center; color: #D4AF37; font-family: 'Cinzel', serif;
+      font-size: 0.72rem; letter-spacing: 0.12em;
+      background: linear-gradient(145deg, rgba(212,175,55,0.12), transparent 60%);
+    }
+    .search-wrap { position: relative; flex: 1; max-width: 280px; }
+    .search-wrap input {
+      width: 100%; background: #FFFBF5; border: 1px solid rgba(212,175,55,0.2);
+      color: #1A1A1A; padding: 0.55rem 0.9rem 0.55rem 2.2rem; font-size: 0.75rem; outline: none;
+    }
+    .search-wrap input:focus { border-color: rgba(212,175,55,0.55); }
+    .search-icon { position: absolute; left: 0.7rem; top: 50%; transform: translateY(-50%); color: rgba(212,175,55,0.65); }
+    .nav-link { font-size: 0.68rem; letter-spacing: 0.22em; color: rgba(26, 26, 26,0.55); transition: color 0.3s; }
+    .nav-link:hover, .nav-link.active { color: #D4AF37; }
+    .icon-btn {
+      width: 40px; height: 40px; border: 1px solid rgba(212,175,55,0.25);
+      display: grid; place-items: center; color: #D4AF37; transition: background 0.3s, border-color 0.3s;
+    }
+    .icon-btn:hover { background: rgba(212,175,55,0.1); border-color: rgba(212,175,55,0.55); }
+    #sidebar-overlay {
+      position: fixed; inset: 0; z-index: 80; background: rgba(26, 26, 26, 0.28);
+      opacity: 0; visibility: hidden; transition: opacity 0.35s, visibility 0.35s;
+    }
+    #sidebar-overlay.open { opacity: 1; visibility: visible; }
+    #sidebar {
+      position: fixed; top: 0; right: 0; z-index: 90; width: min(360px, 88vw); height: 100%;
+      background: linear-gradient(180deg, #FFFBF5, #F0EBE3); border-left: 1px solid rgba(212,175,55,0.22);
+      transform: translateX(105%); transition: transform 0.45s cubic-bezier(0.22,1,0.36,1);
+      padding: 1.5rem; overflow-y: auto;
+    }
+    #sidebar.open { transform: translateX(0); }
+    .sidebar-link {
+      display: block; padding: 0.85rem 0; border-bottom: 1px solid rgba(212,175,55,0.1);
+      font-size: 0.75rem; letter-spacing: 0.2em; color: rgba(26, 26, 26,0.7);
+      transition: color 0.25s, padding-left 0.25s;
+    }
+    .sidebar-link:hover { color: #D4AF37; padding-left: 0.4rem; }
+    #toast {
+      position: fixed; bottom: 1.75rem; left: 50%; transform: translateX(-50%) translateY(120%);
+      z-index: 100; background: linear-gradient(135deg, #FFFBF5, #F7F3EC);
+      border: 1px solid rgba(212,175,55,0.45); color: #D4AF37; padding: 0.75rem 1.4rem;
+      font-size: 0.7rem; letter-spacing: 0.2em; font-family: 'Cinzel', serif;
+      transition: transform 0.4s cubic-bezier(0.22,1,0.36,1); pointer-events: none;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+    #search-results {
+      position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 60;
+      background: #FFFBF5; border: 1px solid rgba(212,175,55,0.25); display: none;
+    }
+    #search-results.open { display: block; }
+    #search-results a {
+      display: block; padding: 0.7rem 0.9rem; font-size: 0.72rem; letter-spacing: 0.12em;
+      color: rgba(26, 26, 26,0.7); border-bottom: 1px solid rgba(212,175,55,0.08);
+    }
+    #search-results a:hover { color: #D4AF37; background: rgba(212,175,55,0.06); }
+    .prose-legal h2 { font-family: 'Cinzel', serif; letter-spacing: 0.12em; color: #D4AF37; font-size: 0.95rem; margin: 2rem 0 0.75rem; }
+    .prose-legal p, .prose-legal li { color: rgba(26, 26, 26,0.62); font-size: 0.9rem; line-height: 1.7; }
+    .prose-legal ul { list-style: disc; padding-left: 1.25rem; margin: 0.5rem 0 1rem; }
+    .prose-legal li { margin: 0.35rem 0; }
+    .prose-legal a { color: #D4AF37; }
+    .prose-legal a:hover { text-decoration: underline; }
+  </style>
+</head><body class="bg-ivory">
+  <div id="toast" role="status" aria-live="polite">Link Copied!</div>
+  <div id="sidebar-overlay" data-close-menu></div>
+  <aside id="sidebar" aria-label="VIP navigation">
+    <div class="flex items-center justify-between mb-8">
+      <div class="flex items-center gap-3">
+        <div class="monogram">ABS</div>
+        <span class="font-display text-[0.7rem] tracking-[0.22em] text-champagne">APP BAZAAR STUDIO</span>
+      </div>
+      <button type="button" class="icon-btn" data-close-menu aria-label="Close menu">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <nav class="space-y-0">
+      <a class="sidebar-link" href="index.html" data-close-menu>HOME</a>
+      <a class="sidebar-link" href="asankarobar.html" data-close-menu>ASAN KAROBAR</a>
+      <a class="sidebar-link" href="deen360.html" data-close-menu>DEEN360</a>
+      <a class="sidebar-link" href="about.html" data-close-menu>ABOUT</a>
+      <a class="sidebar-link" href="contact.html" data-close-menu>CONTACT</a>
+      <a class="sidebar-link" href="privacy-policy.html" data-close-menu>PRIVACY POLICY</a>
+      <a class="sidebar-link" href="terms.html" data-close-menu>TERMS</a>
+      <a class="sidebar-link" href="asankarobar-privacy.html" data-close-menu>ASAN KAROBAR PRIVACY</a>
+      <a class="sidebar-link" href="deen360-privacy.html" data-close-menu>DEEN360 PRIVACY</a>
+      <button type="button" class="sidebar-link w-full text-left" data-share data-close-menu>SHARE WEBSITE</button>
+    </nav>
+  </aside>
+  <header class="site-header fixed top-0 inset-x-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-[72px] flex items-center gap-3 sm:gap-5">
+      <a href="index.html" class="flex items-center gap-3 shrink-0">
+        <div class="monogram">ABS</div>
+        <div class="hidden sm:block">
+          <div class="font-display text-[0.72rem] tracking-[0.24em] text-champagne leading-none">APP BAZAAR</div>
+          <div class="font-display text-[0.58rem] tracking-[0.32em] text-charcoal/45 mt-1">STUDIO</div>
+        </div>
+      </a>
+      <div class="search-wrap mx-auto">
+        <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="app-search" type="search" placeholder="Search apps…" autocomplete="off" aria-label="Search apps" />
+        <div id="search-results" role="listbox"></div>
+      </div>
+      <nav class="hidden lg:flex items-center gap-6 shrink-0">
+        <a class="nav-link" href="index.html#apps">APPS</a>
+        <a class="nav-link" href="about.html">ABOUT</a>
+        <a class="nav-link" href="asankarobar.html">ASAN KAROBAR</a>
+        <a class="nav-link" href="deen360.html">DEEN360</a>
+        <a class="nav-link" href="contact.html">CONTACT</a>
+      </nav>
+      <button type="button" class="icon-btn shrink-0" data-share aria-label="Share website">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.5 13.5l7 4M15.5 6.5l-7 4"/></svg>
+      </button>
+      <button type="button" id="menu-btn" class="icon-btn shrink-0" aria-label="Open menu">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </header>  <main class="pt-[72px]">
+    <section class="max-w-3xl mx-auto px-4 sm:px-6 py-16 prose-legal">
+      <p class="font-display text-[0.62rem] tracking-[0.3em] text-champagne mb-3">LEGAL</p>
+      <h1 class="font-display text-2xl tracking-[0.1em] text-charcoal mb-2">Deen360 Privacy Policy</h1>
+      <p class="text-charcoal/40 text-sm mb-8">Last updated: November 18, 2026 · App Bazaar Studio</p>
+      <p>This Privacy Policy describes how <strong class="text-charcoal/80 font-medium">Deen360</strong> (“the App”), published by App Bazaar Studio, handles information. By using the App, you agree to this policy. For website practices, see our <a href="privacy-policy.html">Website Privacy Policy</a>.</p>
+      <h2>Prayer Times &amp; Qibla Location</h2>
+      <p>Deen360 provides prayer times and Qibla direction. To calculate accurate timings and Qibla bearing, the App may use location-related data when you grant permission.</p>
+      <ul>
+        <li>Location may be obtained from device GPS, network-based location, or a city/manual location you select.</li>
+        <li>Location is used to compute prayer schedules and Qibla direction — not to build marketing profiles for App Bazaar Studio.</li>
+        <li>You can deny or revoke location permission in system settings; some features may then rely on manual city selection or become limited.</li>
+      </ul>
+      <h2>App Features &amp; Local Content</h2>
+      <p>Content such as Quran reading progress, favorites, or preferences may be stored locally on your device. We do not require you to share personal worship data with us to use core offline-capable features.</p>
+      <h2>Advertising (AdMob)</h2>
+      <p>The App may display advertisements through Google AdMob or similar Google advertising services. These services may collect device and usage information to show and measure ads, subject to Google’s policies.</p>
+      <ul>
+        <li><a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer">Google Advertising Privacy</a></li>
+        <li><a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google Privacy &amp; Terms</a></li>
+      </ul>
+      <h2>Children’s Privacy</h2>
+      <p>Parents and guardians are welcome to use Deen360 with their families. We do not knowingly collect personal information from children under 13 for our own databases. If you believe such information was collected, contact us so we can delete it.</p>
+      <h2>Contact</h2>
+      <ul>
+        <li><strong class="text-charcoal/85 font-medium">Email:</strong> <a href="mailto:asankarobar.officials@gmail.com">asankarobar.officials@gmail.com</a></li>
+        <li><strong class="text-charcoal/85 font-medium">Publisher:</strong> App Bazaar Studio</li>
+      </ul>
+    </section>
+  </main>  <footer class="border-t border-champagne/25 py-12 px-4 sm:px-6 bg-[#FFFBF5]/
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row md:items-start md:justify-between gap-10">
+      <div>
+        <div class="flex items-center gap-3 mb-3">
+          <div class="monogram" style="width:36px;height:36px;font-size:0.62rem;">ABS</div>
+          <span class="font-display text-xs tracking-[0.24em] text-champagne">APP BAZAAR STUDIO</span>
+        </div>
+        <p class="text-[0.7rem] text-charcoal/35 tracking-wide">© 2026 App Bazaar Studio · appbazaarstudio.com</p>
+        <p class="mt-2 text-[0.65rem] text-charcoal/30 tracking-wide"><a href="mailto:asankarobar.officials@gmail.com" class="hover:text-champagne transition-colors">asankarobar.officials@gmail.com</a></p>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-8 sm:gap-14">
+        <div>
+          <p class="font-display text-[0.58rem] tracking-[0.22em] text-champagne mb-3">STUDIO</p>
+          <div class="flex flex-col gap-2 text-[0.65rem] tracking-[0.16em] text-charcoal/40">
+            <a href="about.html" class="hover:text-champagne transition-colors">ABOUT</a>
+            <a href="contact.html" class="hover:text-champagne transition-colors">CONTACT</a>
+            <a href="privacy-policy.html" class="hover:text-champagne transition-colors">PRIVACY POLICY</a>
+            <a href="terms.html" class="hover:text-champagne transition-colors">TERMS</a>
+            <button type="button" data-share class="text-left hover:text-champagne transition-colors uppercase">Share</button>
+          </div>
+        </div>
+        <div>
+          <p class="font-display text-[0.58rem] tracking-[0.22em] text-champagne/70 mb-3">APP POLICIES</p>
+          <div class="flex flex-col gap-2 text-[0.65rem] tracking-[0.16em] text-charcoal/35">
+            <a href="asankarobar-privacy.html" class="hover:text-champagne transition-colors">ASAN KAROBAR PRIVACY</a>
+            <a href="deen360-privacy.html" class="hover:text-champagne transition-colors">DEEN360 PRIVACY</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>  <script>
+    (function () {
+      const isTouch = matchMedia('(hover: none), (pointer: coarse)').matches;
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      function openMenu() { sidebar.classList.add('open'); overlay.classList.add('open'); document.body.style.overflow = 'hidden'; }
+      function closeMenu() { sidebar.classList.remove('open'); overlay.classList.remove('open'); document.body.style.overflow = ''; }
+      document.getElementById('menu-btn').addEventListener('click', openMenu);
+      document.querySelectorAll('[data-close-menu]').forEach(function (el) { el.addEventListener('click', closeMenu); });
+      const toast = document.getElementById('toast');
+      let toastTimer;
+      function showToast() {
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 2200);
+      }
+      async function shareSite() {
+        const pageUrl = window.location.href.split('#')[0];
+        if (navigator.share && isTouch) {
+          try { await navigator.share({ title: 'App Bazaar Studio', text: 'App Bazaar Studio', url: pageUrl }); return; } catch (e) {}
+        }
+        try { await navigator.clipboard.writeText(pageUrl); showToast(); }
+        catch (e) {
+          const ta = document.createElement('textarea'); ta.value = pageUrl; document.body.appendChild(ta); ta.select();
+          document.execCommand('copy'); document.body.removeChild(ta); showToast();
+        }
+      }
+      document.querySelectorAll('[data-share]').forEach(function (b) { b.addEventListener('click', shareSite); });
+      const apps = [
+        { name: 'Asan Karobar', href: 'asankarobar.html', keywords: 'asan karobar' },
+        { name: 'Deen360', href: 'deen360.html', keywords: 'deen360' },
+        { name: 'About', href: 'about.html', keywords: 'about' },
+        { name: 'Contact', href: 'contact.html', keywords: 'contact' },
+        { name: 'Privacy Policy', href: 'privacy-policy.html', keywords: 'privacy' },
+        { name: 'Terms', href: 'terms.html', keywords: 'terms' },
+      ];
+      const input = document.getElementById('app-search');
+      const results = document.getElementById('search-results');
+      function renderSearch() {
+        const q = (input.value || '').trim().toLowerCase();
+        if (!q) { results.classList.remove('open'); results.innerHTML = ''; return; }
+        const hits = apps.filter(function (a) { return (a.name + ' ' + a.keywords).toLowerCase().indexOf(q) !== -1; });
+        results.innerHTML = hits.length
+          ? hits.map(function (a) { return '<a href="' + a.href + '">' + a.name + '</a>'; }).join('')
+          : '<a href="index.html">Go to Home</a>';
+        results.classList.add('open');
+      }
+      input.addEventListener('input', renderSearch);
+      input.addEventListener('focus', renderSearch);
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && (input.value || '').trim()) {
+          window.location.href = 'index.html?q=' + encodeURIComponent(input.value.trim());
+        }
+      });
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('.search-wrap')) results.classList.remove('open');
+      });
+    })();
+  </script>
+</body>
+</html>
