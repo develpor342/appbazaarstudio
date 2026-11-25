@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=deen360-1" />
+  <link rel="stylesheet" href="styles.css?v=phase3" />
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to main content</a>
@@ -52,11 +52,15 @@
       <div class="wrap product-hero-grid">
         <div>
           <p class="kicker">Lifestyle · App Bazaar Studio</p>
-          <h1 class="page-title">Deen360</h1>
+          <div class="product-title-row">
+            <img class="case-icon product-hero-icon" src="assets/products/deen360/deen360-icon.jpg" width="56" height="56" alt="Deen360 logo" />
+            <h1 class="page-title">Deen360</h1>
+          </div>
           <p class="tagline">Complete Islamic companion</p>
           <p class="lead">A refined companion for daily worship — Holy Quran, accurate prayer times, Qibla direction, and curated Duas &amp; Hadith in one calm experience.</p>
-          <div class="cta-row">
-            <a class="btn btn-primary" href="#download-android" id="download-android">Download for Android</a>
+          <div class="cta-row" id="download-android">
+            <span class="btn btn-primary btn-coming-soon" aria-disabled="true" title="Coming soon">Android APK · Coming Soon</span>
+            <span class="btn btn-secondary btn-coming-soon" aria-disabled="true" title="Coming soon">Play Store · Coming Soon</span>
             <a class="btn btn-secondary" href="deen360-privacy.html">Privacy policy</a>
           </div>
           <a class="privacy-link" href="deen360-privacy.html">View full privacy →</a>
@@ -183,6 +187,7 @@
       <p class="footer-copy">© 2026 App Bazaar Studio · appbazaarstudio.com</p>
     </div>
   </footer>
-  <script src="site.js?v=polish1"></script>
+  <script src="data/site-config.js?v=phase3"></script>
+  <script src="site.js?v=phase3"></script>
 </body>
 </html>

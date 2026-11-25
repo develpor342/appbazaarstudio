@@ -1,0 +1,77 @@
+{
+  "projects": [
+    {
+      "id": "asan-karobar",
+      "title": "Asan Karobar",
+      "href": "asankarobar.html",
+      "category": "business",
+      "platforms": ["android", "windows"],
+      "featured": true,
+      "status": "shipped",
+      "tags": ["Business", "Featured"],
+      "description": "Billing, parties, inventory, and books for small commerce — mobile and desktop.",
+      "search": "asan karobar billing parties inventory books commerce mobile desktop business",
+      "icon": "assets/products/asan-karobar-icon.png",
+      "iconAlt": "Asan Karobar icon",
+      "cover": "assets/products/asan-karobar-desktop.webp",
+      "coverAlt": "Asan Karobar desktop application screenshot",
+      "coverClass": "shot",
+      "coverWidth": 800,
+      "coverHeight": 450,
+      "actions": [
+        { "label": "View Project", "href": "asankarobar.html", "style": "primary" },
+        { "label": "Download APK", "href": "downloads/asan-karobar-1.0.5.apk", "style": "secondary", "download": true },
+        { "label": "Windows ZIP", "href": "downloads/AsanKarobar_Windows_1.0.6.zip", "style": "secondary", "download": true }
+      ]
+    },
+    {
+      "id": "deen360",
+      "title": "Deen360",
+      "href": "deen360.html",
+      "category": "lifestyle",
+      "platforms": ["android"],
+      "featured": true,
+      "status": "shipped",
+      "tags": ["Lifestyle", "Featured"],
+      "description": "A calm Islamic companion for prayer, Quran, and daily practice.",
+      "search": "deen360 islamic prayer quran duas hadith lifestyle companion",
+      "icon": "assets/products/deen360/deen360-icon.jpg",
+      "iconAlt": "Deen360 icon",
+      "cover": "assets/products/deen360/deen360-home.jpg",
+      "coverAlt": "Deen360 home screen screenshot",
+      "coverClass": "shot shot-phone",
+      "coverWidth": 390,
+      "coverHeight": 844,
+      "actions": [
+        { "label": "View Project", "href": "deen360.html", "style": "primary" },
+        { "label": "Android APK", "style": "secondary", "comingSoon": true },
+        { "label": "Play Store", "style": "secondary", "comingSoon": true }
+      ],
+      "screenshots": [
+        { "src": "assets/products/deen360/deen360-splash.jpg", "alt": "Deen360 splash screen", "caption": "Splash" },
+        { "src": "assets/products/deen360/deen360-home.jpg", "alt": "Deen360 home screen", "caption": "Home" },
+        { "src": "assets/products/deen360/deen360-quran.jpg", "alt": "Deen360 Quran screen", "caption": "Quran" },
+        { "src": "assets/products/deen360/deen360-quran-list.jpg", "alt": "Deen360 Quran list screen", "caption": "Quran list" },
+        { "src": "assets/products/deen360/deen360-hadith.jpg", "alt": "Deen360 Hadith screen", "caption": "Hadith" },
+        { "src": "assets/products/deen360/deen360-ibadaat.jpg", "alt": "Deen360 Ibadaat screen", "caption": "Ibadaat" },
+        { "src": "assets/products/deen360/deen360-qibla.jpg", "alt": "Deen360 Qibla screen", "caption": "Qibla" },
+        { "src": "assets/products/deen360/deen360-more.jpg", "alt": "Deen360 More screen", "caption": "More" }
+      ]
+    },
+    {
+      "id": "future-release",
+      "title": "Future release",
+      "href": "",
+      "category": "upcoming",
+      "platforms": [],
+      "featured": false,
+      "status": "upcoming",
+      "tags": ["Upcoming"],
+      "description": "Next studio product — details soon.",
+      "search": "future release upcoming soon",
+      "icon": "",
+      "cover": "",
+      "actions": []
+    }
+  ]
+}

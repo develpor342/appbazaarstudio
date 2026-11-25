@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=deen360-1" />
+  <link rel="stylesheet" href="styles.css?v=phase3" />
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to main content</a>
@@ -130,54 +130,8 @@
           <h2 class="section-title">Products shipping now</h2>
           <p class="section-lead">Case-study style showcases for live releases — downloads stay on each product page.</p>
         </div>
-        <div class="featured-grid reveal">
-          <article class="case-card">
-            <div class="case-media">
-              <img class="shot" src="assets/products/asan-karobar-desktop.webp" width="800" height="450" alt="Asan Karobar desktop application screenshot" loading="lazy" decoding="async" />
-            </div>
-            <div class="case-body">
-              <div class="case-top">
-                <img class="case-icon" src="assets/products/asan-karobar-icon.png" width="48" height="48" alt="Asan Karobar icon" />
-                <div>
-                  <span class="tag">Business</span>
-                  <span class="tag tag-featured">Featured</span>
-                </div>
-              </div>
-              <h3>Asan Karobar</h3>
-              <p>Billing, parties, inventory, and books for small commerce — mobile and desktop.</p>
-              <div style="margin-top:0.75rem;">
-                <span class="chip">Android</span>
-                <span class="chip">Windows</span>
-              </div>
-              <div class="case-actions">
-                <a class="btn btn-primary" href="asankarobar.html">View Project</a>
-                <a class="btn btn-secondary" href="downloads/asan-karobar-1.0.5.apk" download>Download APK</a>
-                <a class="btn btn-secondary" href="downloads/AsanKarobar_Windows_1.0.6.zip" download>Windows ZIP</a>
-              </div>
-            </div>
-          </article>
-
-          <article class="case-card">
-            <div class="case-media">
-              <img class="shot shot-phone" src="assets/products/deen360/deen360-home.jpg" width="390" height="844" alt="Deen360 home screen screenshot" loading="lazy" decoding="async" />
-            </div>
-            <div class="case-body">
-              <div class="case-top">
-                <div class="case-icon-fallback" aria-hidden="true">D360</div>
-                <div>
-                  <span class="tag">Lifestyle</span>
-                  <span class="tag tag-featured">Featured</span>
-                </div>
-              </div>
-              <h3>Deen360</h3>
-              <p>A calm Islamic companion for prayer, Quran, and daily practice.</p>
-              <div style="margin-top:0.75rem;"><span class="chip">Android</span></div>
-              <div class="case-actions">
-                <a class="btn btn-primary" href="deen360.html">View Project</a>
-                <a class="btn btn-secondary" href="deen360.html#download-android">Download CTA</a>
-              </div>
-            </div>
-          </article>
+        <div class="featured-grid reveal" id="featured-grid">
+          <!-- Rendered from data/projects.json -->
         </div>
       </div>
     </section>
@@ -202,42 +156,7 @@
         </div>
         <p id="filter-live" aria-live="polite"></p>
         <div class="projects-grid reveal" id="projects-grid">
-          <a class="project-card" href="asankarobar.html" data-project
-             data-category="business" data-platforms="android windows"
-             data-search="asan karobar billing parties inventory books commerce mobile desktop business">
-            <div class="project-card-body">
-              <img class="case-icon" src="assets/products/asan-karobar-icon.png" width="40" height="40" alt="" loading="lazy" decoding="async" />
-              <span class="tag tag-featured">Featured</span>
-              <span class="tag">Business</span>
-              <h3>Asan Karobar</h3>
-              <p>Billing, parties, inventory, and books for small commerce — mobile and desktop.</p>
-              <div style="margin-top:0.75rem;"><span class="chip">Android</span><span class="chip">Windows</span></div>
-              <span class="card-go">View →</span>
-            </div>
-          </a>
-          <a class="project-card" href="deen360.html" data-project
-             data-category="lifestyle" data-platforms="android"
-             data-search="deen360 islamic prayer quran duas hadith lifestyle companion">
-            <div class="project-card-body">
-              <div class="case-icon-fallback" style="width:40px;height:40px;font-size:0.65rem;margin-bottom:0.65rem;" aria-hidden="true">D360</div>
-              <span class="tag tag-featured">Featured</span>
-              <span class="tag">Lifestyle</span>
-              <h3>Deen360</h3>
-              <p>A calm Islamic companion for prayer, Quran, and daily practice.</p>
-              <div style="margin-top:0.75rem;"><span class="chip">Android</span></div>
-              <span class="card-go">View →</span>
-            </div>
-          </a>
-          <div class="project-card is-soon" data-project aria-disabled="true"
-               data-category="upcoming" data-platforms=""
-               data-search="future release upcoming soon">
-            <div class="project-card-body">
-              <span class="tag">Upcoming</span>
-              <h3>Future release</h3>
-              <p>Next studio product — details soon.</p>
-              <span class="card-go">Soon</span>
-            </div>
-          </div>
+          <!-- Rendered from data/projects.json -->
         </div>
         <div class="empty-state" id="projects-empty">No projects match. Clear filters.</div>
       </div>
@@ -506,6 +425,7 @@
     </div>
   </footer>
 
-  <script src="site.js?v=polish1"></script>
+  <script src="data/site-config.js?v=phase3"></script>
+  <script src="site.js?v=phase3"></script>
 </body>
 </html>

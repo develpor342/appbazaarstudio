@@ -1,5 +1,5 @@
 (function () {
-  // Only render optional channels when configured (do not invent).
+  // Contact / ads config lives in data/site-config.js (placeholders only — do not invent).
   window.ABS_CONTACT = window.ABS_CONTACT || {
     email: 'asankarobar.officials@gmail.com',
     whatsapp: '',
@@ -42,7 +42,7 @@
     }, { passive: true });
   }
 
-  // Optional social / WhatsApp
+  // Optional social / WhatsApp — only when real URLs are configured
   var socialHost = document.getElementById('optional-social');
   if (socialHost) {
     var cfg = window.ABS_CONTACT;
@@ -73,29 +73,125 @@
       if (r.top < window.innerHeight * 0.94 && r.bottom > 40) markReveal(el);
     });
   }
-  if (!reduce && 'IntersectionObserver' in window) {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          markReveal(entry.target);
-          io.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.08, rootMargin: '80px 0px 0px 0px' });
-    document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
-    revealInView();
-    window.addEventListener('scroll', revealInView, { passive: true });
-    window.addEventListener('resize', revealInView);
-    setTimeout(function () {
-      document.querySelectorAll('.reveal:not(.in)').forEach(markReveal);
-    }, 2200);
-  } else {
-    document.querySelectorAll('.reveal').forEach(markReveal);
+  function wireReveal() {
+    if (!reduce && 'IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            markReveal(entry.target);
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.08, rootMargin: '80px 0px 0px 0px' });
+      document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+      revealInView();
+      window.addEventListener('scroll', revealInView, { passive: true });
+      window.addEventListener('resize', revealInView);
+      setTimeout(function () {
+        document.querySelectorAll('.reveal:not(.in)').forEach(markReveal);
+      }, 2200);
+    } else {
+      document.querySelectorAll('.reveal').forEach(markReveal);
+    }
   }
 
-  // Homepage project filters
-  var grid = document.getElementById('projects-grid');
-  if (grid) {
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function platformLabel(p) {
+    if (!p) return '';
+    return p.charAt(0).toUpperCase() + p.slice(1);
+  }
+
+  function actionButton(a) {
+    var cls = a.style === 'primary' ? 'btn btn-primary' : 'btn btn-secondary';
+    if (a.comingSoon) {
+      return '<span class="' + cls + ' btn-coming-soon" aria-disabled="true" title="Coming soon">' +
+        escapeHtml(a.label) + ' · Coming Soon</span>';
+    }
+    var dl = a.download ? ' download' : '';
+    return '<a class="' + cls + '" href="' + escapeHtml(a.href || '#') + '"' + dl + '>' +
+      escapeHtml(a.label) + '</a>';
+  }
+
+  function tagHtml(tags) {
+    return (tags || []).map(function (t) {
+      var extra = (String(t).toLowerCase() === 'featured') ? ' tag-featured' : '';
+      return '<span class="tag' + extra + '">' + escapeHtml(t) + '</span>';
+    }).join('');
+  }
+
+  function chipHtml(platforms) {
+    return (platforms || []).map(function (p) {
+      return '<span class="chip">' + escapeHtml(platformLabel(p)) + '</span>';
+    }).join('');
+  }
+
+  function renderFeaturedCard(p) {
+    var media = '';
+    if (p.cover) {
+      media = '<div class="case-media">' +
+        '<img class="' + escapeHtml(p.coverClass || 'shot') + '" src="' + escapeHtml(p.cover) + '"' +
+        (p.coverWidth ? ' width="' + p.coverWidth + '"' : '') +
+        (p.coverHeight ? ' height="' + p.coverHeight + '"' : '') +
+        ' alt="' + escapeHtml(p.coverAlt || p.title) + '" loading="lazy" decoding="async" />' +
+        '</div>';
+    }
+    var icon = p.icon
+      ? '<img class="case-icon" src="' + escapeHtml(p.icon) + '" width="48" height="48" alt="' + escapeHtml(p.iconAlt || '') + '" />'
+      : '<div class="case-icon-fallback" aria-hidden="true">' + escapeHtml((p.title || '?').slice(0, 4)) + '</div>';
+    var chips = chipHtml(p.platforms);
+    var actions = (p.actions || []).map(actionButton).join('\n            ');
+    return '<article class="case-card">' +
+      media +
+      '<div class="case-body">' +
+      '<div class="case-top">' + icon +
+      '<div>' + tagHtml(p.tags) + '</div>' +
+      '</div>' +
+      '<h3>' + escapeHtml(p.title) + '</h3>' +
+      '<p>' + escapeHtml(p.description || '') + '</p>' +
+      (chips ? '<div style="margin-top:0.75rem;">' + chips + '</div>' : '') +
+      '<div class="case-actions">' + actions + '</div>' +
+      '</div></article>';
+  }
+
+  function renderProjectCard(p) {
+    if (p.status === 'upcoming') {
+      return '<div class="project-card is-soon" data-project aria-disabled="true"' +
+        ' data-category="upcoming" data-platforms=""' +
+        ' data-search="' + escapeHtml(p.search || '') + '">' +
+        '<div class="project-card-body">' +
+        '<span class="tag">Upcoming</span>' +
+        '<h3>' + escapeHtml(p.title || 'Future release') + '</h3>' +
+        '<p>' + escapeHtml(p.description || 'Next studio product — details soon.') + '</p>' +
+        '<span class="card-go">Soon</span>' +
+        '</div></div>';
+    }
+    var platforms = (p.platforms || []).join(' ');
+    var icon = p.icon
+      ? '<img class="case-icon" src="' + escapeHtml(p.icon) + '" width="40" height="40" alt="" loading="lazy" decoding="async" />'
+      : '';
+    var chips = chipHtml(p.platforms);
+    return '<a class="project-card" href="' + escapeHtml(p.href || '#') + '" data-project' +
+      ' data-category="' + escapeHtml(p.category || '') + '"' +
+      ' data-platforms="' + escapeHtml(platforms) + '"' +
+      ' data-search="' + escapeHtml(p.search || '') + '">' +
+      '<div class="project-card-body">' +
+      icon +
+      tagHtml(p.tags) +
+      '<h3>' + escapeHtml(p.title) + '</h3>' +
+      '<p>' + escapeHtml(p.description || '') + '</p>' +
+      (chips ? '<div style="margin-top:0.75rem;">' + chips + '</div>' : '') +
+      '<span class="card-go">View →</span>' +
+      '</div></a>';
+  }
+
+  function wireFilters(grid) {
     var cards = Array.prototype.slice.call(grid.querySelectorAll('[data-project]'));
     var empty = document.getElementById('projects-empty');
     var live = document.getElementById('filter-live');
@@ -164,6 +260,40 @@
     }
     apply();
   }
+
+  function loadProjects() {
+    var featuredEl = document.getElementById('featured-grid');
+    var gridEl = document.getElementById('projects-grid');
+    if (!featuredEl && !gridEl) {
+      wireReveal();
+      return;
+    }
+
+    fetch('data/projects.json')
+      .then(function (r) {
+        if (!r.ok) throw new Error('projects.json ' + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        var list = (data && data.projects) || [];
+        if (featuredEl) {
+          featuredEl.innerHTML = list.filter(function (p) { return p.featured; })
+            .map(renderFeaturedCard).join('');
+        }
+        if (gridEl) {
+          gridEl.innerHTML = list.map(renderProjectCard).join('');
+          wireFilters(gridEl);
+        }
+        wireReveal();
+        revealInView();
+      })
+      .catch(function (err) {
+        console.error('Failed to load projects', err);
+        wireReveal();
+      });
+  }
+
+  loadProjects();
 
   // Contact form → FormSubmit (real email delivery)
   var form = document.getElementById('contact-form');

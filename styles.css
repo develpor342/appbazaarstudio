@@ -108,6 +108,23 @@ img { display: block; max-width: 100%; }
 }
 .btn-full { width: 100%; }
 .btn-menu { min-width: 84px; }
+.btn-coming-soon {
+  cursor: default;
+  opacity: 0.72;
+  pointer-events: none;
+}
+.btn-coming-soon:hover { transform: none; }
+.product-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 0.35rem;
+}
+.product-hero-icon {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+}
 
 @media (min-width: 1024px) {
   .nav-desktop { display: flex; }

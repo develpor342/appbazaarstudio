@@ -1,0 +1,4 @@
+# App-ads.txt
+# Placeholder only — do not invent publisher IDs.
+# When a genuine AdMob / ads publisher ID is available, replace this file with the official line, for example:
+# google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0
