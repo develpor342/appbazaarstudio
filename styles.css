@@ -512,6 +512,73 @@ footer {
   .hero-phone { width: 28%; right: 2%; bottom: -4%; max-width: 110px; }
 }
 
+/* —— Identity hero (founder portrait) —— */
+.hero-identity { padding-bottom: 2.5rem; }
+.hero-badge {
+  display: inline-flex; align-items: center;
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--accent-primary);
+  padding: 0.4rem 0.85rem; margin-bottom: 1.15rem;
+  border-radius: 999px; border: 1px solid rgba(57, 120, 255, 0.35);
+  background: rgba(57, 120, 255, 0.08);
+  backdrop-filter: blur(8px);
+}
+.hero-title {
+  font-family: "Space Grotesk", sans-serif; font-weight: 700;
+  font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 1.05; letter-spacing: -0.04em;
+  margin-bottom: 1rem;
+}
+.text-endure {
+  background: linear-gradient(90deg, #5B9BFF, #3978FF 40%, #8B5CF6);
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent; -webkit-text-fill-color: transparent;
+}
+.hero-portrait-wrap {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; min-height: 340px;
+}
+.hero-portrait-glow {
+  position: absolute; width: min(420px, 90%); aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(57, 120, 255, 0.28) 0%, rgba(139, 92, 246, 0.1) 42%, transparent 70%);
+  filter: blur(2px); z-index: 0; pointer-events: none;
+}
+.hero-portrait-ring {
+  position: relative; z-index: 1;
+  width: min(360px, 78vw); aspect-ratio: 1;
+  border-radius: 50%;
+  padding: 3px;
+  background: linear-gradient(145deg, rgba(57, 120, 255, 0.55), rgba(148, 163, 184, 0.12) 45%, rgba(139, 92, 246, 0.35));
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+.hero-portrait {
+  width: 100%; height: 100%; border-radius: 50%;
+  object-fit: cover;
+  /* Landscape source: keep person (right) as subject */
+  object-position: 78% 42%;
+  display: block;
+  /* Subtle blue grade — do not distort subject */
+  filter: saturate(1.05) contrast(1.04) brightness(0.96);
+}
+.hero-vision {
+  position: relative; z-index: 1;
+  margin-top: 1.25rem; text-align: center;
+  font-family: "Space Grotesk", sans-serif; font-weight: 600;
+  font-size: clamp(0.95rem, 2vw, 1.1rem); letter-spacing: -0.02em;
+  color: var(--text-secondary);
+  max-width: 22rem;
+}
+.hero-stats { margin-top: 0; }
+@media (max-width: 1023px) {
+  .hero-portrait-wrap { min-height: 300px; margin-top: 0.5rem; }
+  .hero-portrait-ring { width: min(300px, 72vw); }
+}
+@media (max-width: 767px) {
+  .hero-identity .hero-layout { gap: 2rem; }
+  .hero-portrait-ring { width: min(280px, 78vw); }
+}
+
 .case-card {
   display: grid; background: var(--surface-card); border: 1px solid var(--border);
   border-radius: var(--radius-xl); overflow: hidden;
