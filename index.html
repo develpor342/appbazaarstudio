@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=hero2" />
+  <link rel="stylesheet" href="styles.css?v=hero3" />
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to main content</a>
@@ -57,57 +57,59 @@
   <main id="main">
     <section class="hero hero-identity" id="top">
       <div class="hero-grid-bg" aria-hidden="true"></div>
-      <div class="wrap hero-layout">
-        <div class="reveal">
-          <p class="hero-badge">Innovative Software Solutions</p>
-          <h1 class="hero-title">Software built to <span class="text-endure">endure.</span></h1>
-          <p class="hero-sub">An independent studio crafting focused mobile and desktop products — clear, reliable, and ready for the long run.</p>
-          <div class="hero-cta">
-            <a class="btn btn-primary" href="#projects">Explore Projects</a>
-            <a class="btn btn-secondary" href="contact.html">Start a Project</a>
-          </div>
-        </div>
-        <div class="hero-portrait-wrap reveal">
-          <div class="hero-portrait-glow" aria-hidden="true"></div>
-          <div class="hero-portrait-orb">
-            <span class="hero-portrait-ring" aria-hidden="true"></span>
-            <div class="hero-portrait-mask">
-              <img
-                class="hero-portrait"
-                src="assets/studio/founder-mountain.jpg"
-                width="1024"
-                height="576"
-                alt="App Bazaar Studio founder overlooking mountain landscape at dusk"
-              />
+      <div class="wrap hero-identity-inner">
+        <div class="hero-layout">
+          <div class="reveal">
+            <p class="hero-badge"><span class="hero-badge-icon" aria-hidden="true">&lt;/&gt;</span> Innovative Software Solutions</p>
+            <h1 class="hero-title">Software built to <span class="text-endure">endure.</span></h1>
+            <p class="hero-sub">An independent studio crafting focused mobile and desktop products — clear, reliable, and ready for the long run.</p>
+            <div class="hero-cta">
+              <a class="btn btn-primary" href="#projects">Explore Projects →</a>
+              <a class="btn btn-secondary" href="#featured"><span class="play-ico" aria-hidden="true"></span> Watch Overview</a>
             </div>
           </div>
-          <p class="hero-vision">Behind Every Product, There's a Vision.</p>
+          <div class="hero-portrait-wrap reveal">
+            <div class="hero-portrait-glow" aria-hidden="true"></div>
+            <span class="hero-halo" aria-hidden="true"></span>
+            <img
+              class="hero-portrait"
+              src="assets/studio/founder-mountain.jpg"
+              width="1024"
+              height="576"
+              alt="App Bazaar Studio founder overlooking mountain landscape at dusk"
+            />
+            <p class="hero-vision">Build Better</p>
+          </div>
         </div>
-      </div>
-    </section>
 
-    <section class="section section-alt" id="metrics">
-      <div class="wrap">
-        <div class="metrics-grid reveal hero-stats">
-          <div class="metric">
+        <div class="hero-stats-bar reveal" id="metrics">
+          <div class="hero-stat">
             <div class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16v12H4zM8 7V5h8v2" fill="none" stroke="currentColor" stroke-width="1.75"/></svg></div>
-            <div class="metric-value">2</div>
-            <div class="metric-label">Products Shipped</div>
+            <div>
+              <div class="metric-value">2</div>
+              <div class="metric-label">Products Shipped</div>
+            </div>
           </div>
-          <div class="metric">
+          <div class="hero-stat">
             <div class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M9 7h6M9 11h6M9 15h4" fill="none" stroke="currentColor" stroke-width="1.75"/></svg></div>
-            <div class="metric-value" style="font-size:1.15rem;line-height:1.35;">Android · Windows</div>
-            <div class="metric-label">Platforms in Production</div>
+            <div>
+              <div class="metric-value metric-value-sm">Android · Windows</div>
+              <div class="metric-label">Platforms in Production</div>
+            </div>
           </div>
-          <div class="metric">
-            <div class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19" fill="none" stroke="currentColor" stroke-width="1.75"/></svg></div>
-            <div class="metric-value" style="font-size:1.15rem;line-height:1.35;">Independent</div>
-            <div class="metric-label">Independent Studio</div>
+          <div class="hero-stat">
+            <div class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 19l7-14 3 6 4-2-2 10H5z" fill="none" stroke="currentColor" stroke-width="1.75"/></svg></div>
+            <div>
+              <div class="metric-value metric-value-sm">Independent Studio</div>
+              <div class="metric-label">Delivery Model</div>
+            </div>
           </div>
-          <div class="metric">
-            <div class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M12 8v4l3 2" fill="none" stroke="currentColor" stroke-width="1.75"/></svg></div>
-            <div class="metric-value" style="font-size:1.35rem;">24–48h</div>
-            <div class="metric-label">Contact Response</div>
+          <div class="hero-stat">
+            <div class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 14v2a4 4 0 004 4h8a4 4 0 004-4v-2M8 10a4 4 0 108 0V8a4 4 0 10-8 0v2z" fill="none" stroke="currentColor" stroke-width="1.75"/></svg></div>
+            <div>
+              <div class="metric-value metric-value-sm">24–48h</div>
+              <div class="metric-label">Contact Response</div>
+            </div>
           </div>
         </div>
       </div>
