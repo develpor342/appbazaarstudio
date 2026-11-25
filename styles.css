@@ -571,84 +571,76 @@ footer {
   -webkit-background-clip: text; background-clip: text;
   color: transparent; -webkit-text-fill-color: transparent;
 }
-.play-ico {
-  display: inline-block; width: 0; height: 0; margin-right: 0.45rem;
-  border-style: solid; border-width: 5px 0 5px 8px;
-  border-color: transparent transparent transparent currentColor;
-  vertical-align: middle;
-}
-
-/* Perfect soft circle — same as SS */
+/* Full cinematic portrait — NOT circle-cropped (SS) */
 .hero-portrait-wrap {
-  --portrait-size: min(440px, 78vw);
   position: relative;
   width: 100%;
-  min-height: calc(var(--portrait-size) + 48px);
+  min-height: clamp(420px, 58vh, 560px);
   display: grid;
   place-items: center;
   isolation: isolate;
 }
 .hero-portrait-glow {
   position: absolute;
-  width: calc(var(--portrait-size) + 90px);
+  width: min(520px, 95%);
   aspect-ratio: 1;
-  left: 50%; top: 48%;
+  left: 58%; top: 42%;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: radial-gradient(circle at 50% 42%,
-    rgba(57, 120, 255, 0.55) 0%,
-    rgba(57, 120, 255, 0.22) 34%,
-    rgba(139, 92, 246, 0.12) 55%,
+  background: radial-gradient(circle at 50% 45%,
+    rgba(57, 120, 255, 0.5) 0%,
+    rgba(57, 120, 255, 0.2) 36%,
+    rgba(139, 92, 246, 0.1) 55%,
     transparent 72%);
-  filter: blur(28px);
+  filter: blur(30px);
   z-index: 0;
   pointer-events: none;
 }
+/* Thin decorative ring behind person — does NOT crop the photo */
 .hero-halo {
   position: absolute;
-  width: calc(var(--portrait-size) + 36px);
+  width: min(460px, 88%);
   aspect-ratio: 1;
-  left: 50%; top: 48%;
+  left: 58%; top: 40%;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  border: 1.5px solid rgba(130, 175, 255, 0.48);
-  box-shadow:
-    0 0 18px rgba(57, 120, 255, 0.4),
-    0 0 48px rgba(57, 120, 255, 0.18);
+  border: 1px solid rgba(180, 205, 255, 0.35);
+  box-shadow: 0 0 24px rgba(57, 120, 255, 0.22);
   z-index: 1;
   pointer-events: none;
 }
-.hero-portrait-circle {
+.hero-portrait-stage {
   position: relative;
   z-index: 2;
-  width: var(--portrait-size);
-  aspect-ratio: 1;
-  border-radius: 50%;
+  width: min(520px, 100%);
+  height: clamp(420px, 58vh, 560px);
   overflow: hidden;
 }
 .hero-portrait {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 78% 38%;
+  /* Landscape source: keep full person as subject (right side) */
+  object-position: 82% 28%;
   display: block;
-  filter: saturate(1.05) contrast(1.03) brightness(0.94);
+  filter: saturate(1.06) contrast(1.04) brightness(0.92) hue-rotate(-6deg);
 }
-/* Soft edge dissolve into navy (SS) — keeps true circle */
-.hero-portrait-fade {
+/* Soft navy blend — full portrait, not circle-cropped */
+.hero-portrait-blend {
   position: absolute;
   inset: 0;
-  border-radius: 50%;
   pointer-events: none;
-  box-shadow:
-    inset 0 0 24px 14px #080B14,
-    inset 0 0 48px 28px rgba(8, 11, 20, 0.75);
+  background:
+    linear-gradient(90deg, #080B14 0%, rgba(8, 11, 20, 0.75) 10%, transparent 28%),
+    linear-gradient(180deg, #080B14 0%, transparent 16%),
+    linear-gradient(180deg, transparent 72%, rgba(8, 11, 20, 0.55) 88%, #080B14 100%),
+    linear-gradient(270deg, rgba(8, 11, 20, 0.35) 0%, transparent 18%);
 }
 .hero-vision {
   position: absolute;
   z-index: 3;
-  right: max(0%, calc(50% - var(--portrait-size) / 2 - 8px));
-  bottom: 16%;
+  right: 4%;
+  bottom: 22%;
   margin: 0;
   font-family: "Caveat", cursive;
   font-weight: 600;
@@ -710,14 +702,19 @@ footer {
 }
 
 @media (max-width: 1023px) {
-  .hero-portrait-wrap { --portrait-size: min(380px, 72vw); margin-top: 0.5rem; }
+  .hero-portrait-wrap { min-height: 380px; margin-top: 0.5rem; }
+  .hero-portrait-stage { height: 380px; }
+  .hero-halo { left: 50%; }
+  .hero-portrait-glow { left: 50%; }
 }
 @media (max-width: 767px) {
   .hero-identity .hero-layout { gap: 1.5rem; }
-  .hero-portrait-wrap { --portrait-size: min(320px, 84vw); }
+  .hero-portrait-wrap { min-height: 340px; }
+  .hero-portrait-stage { height: 340px; width: min(420px, 100%); }
+  .hero-portrait { object-position: 80% 25%; }
   .hero-vision {
     position: relative; right: auto; bottom: auto;
-    margin-top: 0.75rem; transform: none; text-align: center;
+    margin-top: 0.5rem; transform: none; text-align: center;
   }
 }
 
