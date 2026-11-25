@@ -62,20 +62,35 @@
     }
   }
 
-  // Scroll reveal
+  // Scroll reveal — keep content visible if observer misses a section
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function markReveal(el) {
+    if (el) el.classList.add('in');
+  }
+  function revealInView() {
+    document.querySelectorAll('.reveal:not(.in)').forEach(function (el) {
+      var r = el.getBoundingClientRect();
+      if (r.top < window.innerHeight * 0.94 && r.bottom > 40) markReveal(el);
+    });
+  }
   if (!reduce && 'IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
-          entry.target.classList.add('in');
+          markReveal(entry.target);
           io.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    }, { threshold: 0.08, rootMargin: '80px 0px 0px 0px' });
     document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+    revealInView();
+    window.addEventListener('scroll', revealInView, { passive: true });
+    window.addEventListener('resize', revealInView);
+    setTimeout(function () {
+      document.querySelectorAll('.reveal:not(.in)').forEach(markReveal);
+    }, 2200);
   } else {
-    document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in'); });
+    document.querySelectorAll('.reveal').forEach(markReveal);
   }
 
   // Homepage project filters
