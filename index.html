@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=hero4" />
+  <link rel="stylesheet" href="styles.css?v=hero5" />
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to main content</a>
@@ -33,7 +33,7 @@
         <a href="contact.html">Contact</a>
       </nav>
       <div class="header-actions">
-        <a class="btn btn-primary" href="contact.html">Start a Project</a>
+        <a class="btn btn-primary" href="contact.html">Start a Project →</a>
         <button class="btn btn-secondary btn-menu" type="button" id="menuBtn" aria-label="Open menu" aria-expanded="false">Menu</button>
       </div>
     </div>
@@ -56,10 +56,14 @@
 
   <main id="main">
     <section class="hero hero-identity" id="top">
-      <div class="hero-grid-bg" aria-hidden="true"></div>
+      <div class="hero-ambience" aria-hidden="true">
+        <span class="hero-flare hero-flare-1"></span>
+        <span class="hero-flare hero-flare-2"></span>
+        <span class="hero-flare hero-flare-3"></span>
+      </div>
       <div class="wrap hero-identity-inner">
         <div class="hero-layout">
-          <div class="reveal">
+          <div class="hero-copy reveal">
             <p class="hero-badge"><span class="hero-badge-icon" aria-hidden="true">&lt;/&gt;</span> Innovative Software Solutions</p>
             <h1 class="hero-title">Software built to <span class="text-endure">endure.</span></h1>
             <p class="hero-sub">An independent studio crafting focused mobile and desktop products — clear, reliable, and ready for the long run.</p>
@@ -68,16 +72,20 @@
               <a class="btn btn-secondary" href="#featured"><span class="play-ico" aria-hidden="true"></span> Watch Overview</a>
             </div>
           </div>
+
           <div class="hero-portrait-wrap reveal">
             <div class="hero-portrait-glow" aria-hidden="true"></div>
             <span class="hero-halo" aria-hidden="true"></span>
-            <img
-              class="hero-portrait"
-              src="assets/studio/founder-mountain.jpg"
-              width="1024"
-              height="576"
-              alt="App Bazaar Studio founder overlooking mountain landscape at dusk"
-            />
+            <div class="hero-portrait-circle">
+              <img
+                class="hero-portrait"
+                src="assets/studio/founder-mountain.jpg"
+                width="1024"
+                height="576"
+                alt="App Bazaar Studio founder overlooking mountain landscape at dusk"
+              />
+              <span class="hero-portrait-fade" aria-hidden="true"></span>
+            </div>
             <p class="hero-vision">Build Better</p>
           </div>
         </div>

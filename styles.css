@@ -512,19 +512,41 @@ footer {
   .hero-phone { width: 28%; right: 2%; bottom: -4%; max-width: 110px; }
 }
 
-/* —— Identity hero (match approved SS) —— */
+/* —— Identity hero — exact approved SS —— */
 .hero-identity {
-  padding-bottom: 2rem;
+  padding: 2.5rem 0 2.75rem;
   flex-direction: column;
   justify-content: center;
+  background:
+    radial-gradient(ellipse 55% 45% at 72% 42%, rgba(57, 120, 255, 0.16), transparent 70%),
+    radial-gradient(ellipse 40% 35% at 20% 20%, rgba(139, 92, 246, 0.08), transparent 65%),
+    var(--bg);
 }
+.hero-identity::before { opacity: 0.55; }
+.hero-ambience {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+}
+.hero-flare {
+  position: absolute; border-radius: 50%;
+  background: radial-gradient(circle, rgba(120, 170, 255, 0.55), transparent 70%);
+  filter: blur(2px);
+}
+.hero-flare-1 { width: 8px; height: 8px; top: 18%; left: 42%; opacity: 0.7; }
+.hero-flare-2 { width: 5px; height: 5px; top: 36%; right: 18%; opacity: 0.55; }
+.hero-flare-3 { width: 6px; height: 6px; bottom: 28%; left: 28%; opacity: 0.4; }
+
 .hero-identity-inner {
-  position: relative;
-  width: var(--container-max);
-  margin-inline: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 2.25rem;
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; gap: 2.5rem;
+}
+.hero-identity .hero-layout {
+  align-items: center;
+}
+@media (min-width: 1024px) {
+  .hero-identity .hero-layout {
+    grid-template-columns: 1fr 1.05fr;
+    gap: 1.5rem 2rem;
+  }
 }
 .hero-badge {
   display: inline-flex; align-items: center; gap: 0.45rem;
@@ -545,7 +567,7 @@ footer {
   margin-bottom: 1rem;
 }
 .text-endure {
-  background: linear-gradient(180deg, #7EB6FF 0%, #3978FF 55%, #2554E6 100%);
+  background: linear-gradient(180deg, #9CC4FF 0%, #5B9BFF 35%, #3978FF 70%, #2554E6 100%);
   -webkit-background-clip: text; background-clip: text;
   color: transparent; -webkit-text-fill-color: transparent;
 }
@@ -556,88 +578,102 @@ footer {
   vertical-align: middle;
 }
 
-/* Soft vignette portrait — no hard circular frame */
+/* Perfect soft circle — same as SS */
 .hero-portrait-wrap {
+  --portrait-size: min(440px, 78vw);
   position: relative;
   width: 100%;
-  min-height: clamp(380px, 48vw, 540px);
+  min-height: calc(var(--portrait-size) + 48px);
   display: grid;
   place-items: center;
   isolation: isolate;
 }
 .hero-portrait-glow {
   position: absolute;
-  width: min(540px, 98%);
+  width: calc(var(--portrait-size) + 90px);
   aspect-ratio: 1;
   left: 50%; top: 48%;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 50% 42%, rgba(57, 120, 255, 0.55) 0%, rgba(57, 120, 255, 0.2) 32%, rgba(139, 92, 246, 0.12) 52%, transparent 70%);
-  filter: blur(26px);
+  background: radial-gradient(circle at 50% 42%,
+    rgba(57, 120, 255, 0.55) 0%,
+    rgba(57, 120, 255, 0.22) 34%,
+    rgba(139, 92, 246, 0.12) 55%,
+    transparent 72%);
+  filter: blur(28px);
   z-index: 0;
   pointer-events: none;
 }
 .hero-halo {
   position: absolute;
-  width: min(470px, 88%);
+  width: calc(var(--portrait-size) + 36px);
   aspect-ratio: 1;
-  left: 50%; top: 46%;
+  left: 50%; top: 48%;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  border: 1.5px solid rgba(120, 170, 255, 0.42);
+  border: 1.5px solid rgba(130, 175, 255, 0.48);
   box-shadow:
-    0 0 20px rgba(57, 120, 255, 0.35),
-    0 0 60px rgba(57, 120, 255, 0.15);
+    0 0 18px rgba(57, 120, 255, 0.4),
+    0 0 48px rgba(57, 120, 255, 0.18);
   z-index: 1;
   pointer-events: none;
 }
-.hero-portrait {
+.hero-portrait-circle {
   position: relative;
   z-index: 2;
-  width: min(430px, 84%);
+  width: var(--portrait-size);
   aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.hero-portrait {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   object-position: 78% 38%;
   display: block;
-  /* Soft circular vignette — fades into navy like the SS (no hard border) */
-  -webkit-mask-image: radial-gradient(circle at 50% 46%, #000 52%, rgba(0,0,0,0.65) 68%, transparent 80%);
-  mask-image: radial-gradient(circle at 50% 46%, #000 52%, rgba(0,0,0,0.65) 68%, transparent 80%);
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  filter: saturate(1.06) contrast(1.04) brightness(0.93);
+  filter: saturate(1.05) contrast(1.03) brightness(0.94);
+}
+/* Soft edge dissolve into navy (SS) — keeps true circle */
+.hero-portrait-fade {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 24px 14px #080B14,
+    inset 0 0 48px 28px rgba(8, 11, 20, 0.75);
 }
 .hero-vision {
   position: absolute;
   z-index: 3;
-  right: 4%;
-  bottom: 20%;
+  right: max(0%, calc(50% - var(--portrait-size) / 2 - 8px));
+  bottom: 16%;
   margin: 0;
   font-family: "Caveat", cursive;
   font-weight: 600;
-  font-size: clamp(1.5rem, 3vw, 2rem);
-  color: rgba(248, 250, 252, 0.95);
+  font-size: clamp(1.55rem, 3vw, 2.05rem);
+  color: #F8FAFC;
   line-height: 1;
+  white-space: nowrap;
   text-decoration: underline;
-  text-decoration-color: rgba(91, 155, 255, 0.65);
+  text-decoration-color: rgba(91, 155, 255, 0.7);
   text-underline-offset: 0.28em;
   text-decoration-thickness: 2px;
   pointer-events: none;
-  transform: rotate(-6deg);
+  transform: rotate(-8deg);
 }
 
-/* Glass stats bar inside hero (SS) */
+/* Glass stats bar — SS */
 .hero-stats-bar {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0;
-  background: rgba(17, 24, 39, 0.55);
+  background: rgba(13, 18, 32, 0.72);
   border: 1px solid rgba(148, 163, 184, 0.14);
-  border-radius: var(--radius-xl);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  border-radius: 18px;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
   overflow: hidden;
 }
@@ -646,7 +682,7 @@ footer {
 }
 .hero-stat {
   display: flex; align-items: flex-start; gap: 0.75rem;
-  padding: 1.15rem 1.25rem;
+  padding: 1.2rem 1.3rem;
   border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 }
 @media (min-width: 900px) {
@@ -674,14 +710,15 @@ footer {
 }
 
 @media (max-width: 1023px) {
-  .hero-portrait-wrap { min-height: 340px; margin-top: 0.25rem; }
-  .hero-vision { right: 6%; bottom: 12%; }
+  .hero-portrait-wrap { --portrait-size: min(380px, 72vw); margin-top: 0.5rem; }
 }
 @media (max-width: 767px) {
   .hero-identity .hero-layout { gap: 1.5rem; }
-  .hero-portrait { width: min(340px, 92%); }
-  .hero-halo { width: min(360px, 96%); }
-  .hero-vision { position: relative; right: auto; bottom: auto; margin-top: -1.5rem; transform: none; text-align: center; }
+  .hero-portrait-wrap { --portrait-size: min(320px, 84vw); }
+  .hero-vision {
+    position: relative; right: auto; bottom: auto;
+    margin-top: 0.75rem; transform: none; text-align: center;
+  }
 }
 
 .case-card {
