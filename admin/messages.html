@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Messages — Admin</title>
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <div class="admin-app" id="admin-app"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/firebase-init.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin-shell.js"></script>
+  <script>
+    function esc(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function fmtDate(ts) {
+      if (!ts) return '—';
+      try {
+        var d = ts.toDate ? ts.toDate() : new Date(ts);
+        return d.toLocaleString();
+      } catch (e) { return '—'; }
+    }
+
+    ABSAdmin.requireAdmin().then(function (ctx) {
+      ABSAdmin.mountShell('messages', 'Messages', ctx.user.email);
+      var root = document.getElementById('admin-content');
+
+      function load() {
+        ctx.db.collection('inquiries').orderBy('createdAt', 'desc').limit(100).get()
+          .then(function (snap) {
+            if (snap.empty) {
+              root.innerHTML = '<div class="panel"><p class="empty">No inquiries yet. Messages appear when the public contact form is submitted with Firebase configured.</p></div>';
+              return;
+            }
+            var rows = snap.docs.map(function (d) {
+              var m = d.data();
+              return '<tr data-id="' + esc(d.id) + '" class="' + (m.read ? '' : 'unread') + '">' +
+                '<td>' + (m.read ? '' : '<span class="badge badge-warn">New</span>') + '</td>' +
+                '<td>' + esc(m.name) + '<div class="muted" style="font-size:0.75rem">' + esc(m.email) + '</div></td>' +
+                '<td>' + esc(m.projectType || '—') + '</td>' +
+                '<td>' + esc(m.budget || '—') + '</td>' +
+                '<td>' + fmtDate(m.createdAt) + '</td>' +
+                '<td style="max-width:280px">' + esc((m.message || '').slice(0, 140)) + '</td>' +
+                '<td style="white-space:nowrap">' +
+                  (!m.read ? '<button type="button" class="btn btn-secondary btn-sm" data-read="1">Mark read</button> ' : '') +
+                  '<button type="button" class="btn btn-danger btn-sm" data-del="1">Delete</button>' +
+                '</td></tr>';
+            }).join('');
+            root.innerHTML =
+              '<div class="panel"><div class="panel-head"><h2>Inbox</h2></div>' +
+              '<div class="table-wrap"><table class="data"><thead><tr>' +
+              '<th></th><th>From</th><th>Type</th><th>Budget</th><th>When</th><th>Message</th><th></th>' +
+              '</tr></thead><tbody id="tbody">' + rows + '</tbody></table></div></div>';
+
+            document.getElementById('tbody').addEventListener('click', function (e) {
+              var btn = e.target.closest('button');
+              if (!btn) return;
+              var id = btn.closest('tr').getAttribute('data-id');
+              if (btn.getAttribute('data-read')) {
+                ctx.db.collection('inquiries').doc(id).update({ read: true, status: 'read' })
+                  .then(load)
+                  .catch(function (err) { ABSAdmin.toast(err.message, 'err'); });
+              }
+              if (btn.getAttribute('data-del')) {
+                if (!confirm('Delete this inquiry?')) return;
+                ctx.db.collection('inquiries').doc(id).delete()
+                  .then(load)
+                  .catch(function (err) { ABSAdmin.toast(err.message, 'err'); });
+              }
+            });
+          })
+          .catch(function (err) {
+            root.innerHTML = '<div class="alert alert-error">' + esc(err.message) + '</div>';
+          });
+      }
+      load();
+    });
+  </script>
+</body>
+</html>

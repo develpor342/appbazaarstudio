@@ -261,6 +261,78 @@
     apply();
   }
 
+  function applyProjectList(list) {
+    var featuredEl = document.getElementById('featured-grid');
+    var gridEl = document.getElementById('projects-grid');
+    list = list || [];
+    if (featuredEl) {
+      featuredEl.innerHTML = list.filter(function (p) { return p.featured; })
+        .map(renderFeaturedCard).join('');
+    }
+    if (gridEl) {
+      gridEl.innerHTML = list.map(renderProjectCard).join('');
+      wireFilters(gridEl);
+    }
+    wireReveal();
+    revealInView();
+  }
+
+  function loadProjectsFromJson() {
+    return fetch('data/projects.json')
+      .then(function (r) {
+        if (!r.ok) throw new Error('projects.json ' + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        return (data && data.projects) || [];
+      });
+  }
+
+  function firebaseConfigReady() {
+    var c = window.ABS_FIREBASE || {};
+    return c.apiKey && c.apiKey !== 'REPLACE_ME' && c.apiKey !== 'YOUR_API_KEY'
+      && c.projectId === 'app-bazaar-studio';
+  }
+
+  function loadScript(src) {
+    return new Promise(function (resolve, reject) {
+      if (document.querySelector('script[src="' + src + '"]')) {
+        resolve();
+        return;
+      }
+      var s = document.createElement('script');
+      s.src = src;
+      s.onload = function () { resolve(); };
+      s.onerror = function () { reject(new Error('Failed to load ' + src)); };
+      document.head.appendChild(s);
+    });
+  }
+
+  function ensurePublicFirebase() {
+    if (!firebaseConfigReady()) return Promise.resolve(null);
+    var chain = Promise.resolve();
+    if (!window.firebase) {
+      chain = chain
+        .then(function () { return loadScript('https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js'); })
+        .then(function () { return loadScript('https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js'); });
+    }
+    return chain.then(function () {
+      if (!firebase.apps.length) firebase.initializeApp(window.ABS_FIREBASE);
+      return firebase.firestore();
+    });
+  }
+
+  function loadProjectsFromFirestore(db) {
+    return db.collection('projects').where('published', '==', true).get()
+      .then(function (snap) {
+        return snap.docs.map(function (d) {
+          var data = d.data();
+          data.id = d.id;
+          return data;
+        });
+      });
+  }
+
   function loadProjects() {
     var featuredEl = document.getElementById('featured-grid');
     var gridEl = document.getElementById('projects-grid');
@@ -269,24 +341,18 @@
       return;
     }
 
-    fetch('data/projects.json')
-      .then(function (r) {
-        if (!r.ok) throw new Error('projects.json ' + r.status);
-        return r.json();
+    ensurePublicFirebase()
+      .then(function (db) {
+        if (!db) return loadProjectsFromJson();
+        return loadProjectsFromFirestore(db).then(function (list) {
+          if (!list.length) return loadProjectsFromJson();
+          return list;
+        }).catch(function (err) {
+          console.warn('Firestore projects unavailable, using JSON fallback', err);
+          return loadProjectsFromJson();
+        });
       })
-      .then(function (data) {
-        var list = (data && data.projects) || [];
-        if (featuredEl) {
-          featuredEl.innerHTML = list.filter(function (p) { return p.featured; })
-            .map(renderFeaturedCard).join('');
-        }
-        if (gridEl) {
-          gridEl.innerHTML = list.map(renderProjectCard).join('');
-          wireFilters(gridEl);
-        }
-        wireReveal();
-        revealInView();
-      })
+      .then(applyProjectList)
       .catch(function (err) {
         console.error('Failed to load projects', err);
         wireReveal();
@@ -364,29 +430,57 @@
       _subject: '[App Bazaar Studio] ' + (typeV || 'Project') + ' inquiry from ' + nameV
     };
 
-    fetch('https://formsubmit.co/ajax/' + encodeURIComponent(emailTo), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    }).then(function (res) {
-      if (!res.ok) throw new Error('send_failed');
-      return res.json().catch(function () { return {}; });
-    }).then(function () {
-      status.textContent = 'Message sent. We will reply within 24–48 business hours.';
-      status.classList.add('ok');
-      form.reset();
-    }).catch(function () {
-      status.textContent = 'Could not send right now. Please email ' + emailTo + ' directly.';
-      status.classList.add('error');
-    }).finally(function () {
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = submitBtn.getAttribute('data-label') || 'Send project inquiry';
-      }
-    });
+    var inquiryDoc = {
+      name: nameV,
+      email: emailV,
+      company: companyV || '',
+      projectType: typeV || 'General',
+      budget: budgetV || '',
+      message: messageV,
+      read: false,
+      status: 'new',
+      createdAt: null
+    };
+
+    ensurePublicFirebase()
+      .catch(function () { return null; })
+      .then(function (db) {
+        var writes = [
+          fetch('https://formsubmit.co/ajax/' + encodeURIComponent(emailTo), {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          }).then(function (res) {
+            if (!res.ok) throw new Error('send_failed');
+            return res.json().catch(function () { return {}; });
+          })
+        ];
+        if (db) {
+          inquiryDoc.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          writes.push(db.collection('inquiries').add(inquiryDoc).catch(function (err) {
+            console.warn('Inquiry Firestore write failed', err);
+          }));
+        }
+        return Promise.all(writes);
+      })
+      .then(function () {
+        status.textContent = 'Message sent. We will reply within 24–48 business hours.';
+        status.classList.add('ok');
+        form.reset();
+      })
+      .catch(function () {
+        status.textContent = 'Could not send right now. Please email ' + emailTo + ' directly.';
+        status.classList.add('error');
+      })
+      .finally(function () {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = submitBtn.getAttribute('data-label') || 'Send project inquiry';
+        }
+      });
   });
 
   if (submitBtn && !submitBtn.getAttribute('data-label')) {

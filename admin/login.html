@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Admin Login — App Bazaar Studio</title>
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <main class="admin-login">
+    <form class="login-card" id="login-form" novalidate>
+      <h1>Admin Login</h1>
+      <p class="muted">App Bazaar Studio — authorized access only</p>
+      <div id="login-alert" class="alert alert-error" hidden></div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" autocomplete="username" required />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" autocomplete="current-password" required />
+      </div>
+      <button type="submit" class="btn btn-primary" id="login-btn" style="width:100%">Sign in</button>
+      <p class="muted" style="margin-top:1rem;font-size:0.75rem">Public site: <a href="../index.html">appbazaarstudio.com</a></p>
+    </form>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/firebase-init.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    (function () {
+      var params = new URLSearchParams(location.search);
+      var alertEl = document.getElementById('login-alert');
+      var form = document.getElementById('login-form');
+      var btn = document.getElementById('login-btn');
+
+      if (params.get('denied')) {
+        alertEl.hidden = false;
+        alertEl.textContent = 'This account is signed in but not on the admin allowlist. Add your UID under admins/{uid} in Firestore.';
+      }
+
+      if (!ABSAdmin.configReady()) {
+        alertEl.hidden = false;
+        alertEl.textContent = 'Firebase is not configured yet. Create project app-bazaar-studio and paste the Web config into admin/js/firebase-config.js.';
+      }
+
+      ABSAdmin.initFirebase();
+      if (firebase.apps.length) {
+        firebase.auth().onAuthStateChanged(function (user) {
+          if (!user) return;
+          firebase.firestore().collection('admins').doc(user.uid).get().then(function (snap) {
+            if (snap.exists) {
+              var next = params.get('next') || 'index.html';
+              if (next.indexOf('login.html') !== -1) next = 'index.html';
+              location.replace(next);
+            }
+          });
+        });
+      }
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        alertEl.hidden = true;
+        var email = document.getElementById('email').value.trim();
+        var password = document.getElementById('password').value;
+        if (!email || !password) {
+          alertEl.hidden = false;
+          alertEl.textContent = 'Enter email and password.';
+          return;
+        }
+        btn.disabled = true;
+        btn.textContent = 'Signing in…';
+        ABSAdmin.login(email, password).then(function () {
+          var next = params.get('next') || 'index.html';
+          location.replace(next.indexOf('login.html') !== -1 ? 'index.html' : next);
+        }).catch(function (err) {
+          alertEl.hidden = false;
+          alertEl.textContent = err.message || 'Sign-in failed';
+        }).finally(function () {
+          btn.disabled = false;
+          btn.textContent = 'Sign in';
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

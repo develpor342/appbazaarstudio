@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Seed Data — Admin</title>
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <div class="admin-app" id="admin-app"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/firebase-init.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin-shell.js"></script>
+  <script>
+    ABSAdmin.requireAdmin().then(function (ctx) {
+      ABSAdmin.mountShell('dashboard', 'Seed data', ctx.user.email);
+      var root = document.getElementById('admin-content');
+      root.innerHTML =
+        '<div class="panel">' +
+          '<h2 style="margin-bottom:0.75rem">Migrate portfolio JSON → Firestore</h2>' +
+          '<p class="muted" style="margin-bottom:1rem">Imports <code>../data/projects.json</code>, seeds categories, and creates default settings. Existing project docs with the same id are overwritten (merge). Existing static asset paths are kept as-is.</p>' +
+          '<button type="button" class="btn btn-primary" id="run-seed">Run seed</button>' +
+          '<pre id="log" class="muted" style="margin-top:1rem;white-space:pre-wrap"></pre>' +
+        '</div>';
+
+      var logEl = document.getElementById('log');
+      function log(line) { logEl.textContent += line + '\n'; }
+
+      document.getElementById('run-seed').addEventListener('click', function () {
+        var btn = this;
+        btn.disabled = true;
+        logEl.textContent = '';
+        log('Loading projects.json…');
+
+        fetch('../data/projects.json')
+          .then(function (r) {
+            if (!r.ok) throw new Error('Could not load projects.json');
+            return r.json();
+          })
+          .then(function (data) {
+            var batch = ctx.db.batch();
+            [
+              { id: 'business', label: 'Business' },
+              { id: 'lifestyle', label: 'Lifestyle' },
+              { id: 'upcoming', label: 'Upcoming' }
+            ].forEach(function (c) {
+              batch.set(ctx.db.collection('categories').doc(c.id), {
+                label: c.label,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+              }, { merge: true });
+            });
+            batch.set(ctx.db.collection('settings').doc('site'), {
+              email: 'asankarobar.officials@gmail.com',
+              whatsapp: '',
+              linkedin: '',
+              github: '',
+              appAdsLine: '',
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+
+            (data.projects || []).forEach(function (p) {
+              var doc = Object.assign({}, p, {
+                published: p.status === 'upcoming' ? false : true,
+                featured: !!p.featured,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+              });
+              delete doc.id;
+              batch.set(ctx.db.collection('projects').doc(p.id), doc, { merge: true });
+              log('Queued project: ' + p.id);
+            });
+
+            return batch.commit();
+          })
+          .then(function () {
+            log('Seed complete.');
+            ABSAdmin.toast('Seed complete', 'ok');
+          })
+          .catch(function (err) {
+            log('Error: ' + (err.message || err));
+            ABSAdmin.toast(err.message || 'Seed failed', 'err');
+          })
+          .finally(function () { btn.disabled = false; });
+      });
+    });
+  </script>
+</body>
+</html>

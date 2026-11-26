@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Edit Project — Admin</title>
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <div class="admin-app" id="admin-app"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/firebase-init.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin-shell.js"></script>
+  <script src="js/projects-api.js"></script>
+  <script src="js/uploads.js"></script>
+  <script>
+    function esc(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    ABSAdmin.requireAdmin().then(function (ctx) {
+      var params = new URLSearchParams(location.search);
+      var editId = params.get('id');
+      var isNew = !editId;
+      ABSAdmin.mountShell('projects', isNew ? 'Create project' : 'Edit project', ctx.user.email);
+      var root = document.getElementById('admin-content');
+      var state = {
+        icon: '', cover: '', screenshots: [],
+        apkUrl: '', apkComingSoon: false,
+        playUrl: '', playComingSoon: false,
+        windowsUrl: '', windowsComingSoon: false
+      };
+
+      function actionFieldsFrom(p) {
+        state.apkUrl = ''; state.playUrl = ''; state.windowsUrl = '';
+        state.apkComingSoon = false; state.playComingSoon = false; state.windowsComingSoon = false;
+        (p.actions || []).forEach(function (a) {
+          var label = (a.label || '').toLowerCase();
+          if (label.indexOf('apk') !== -1 || label.indexOf('android') !== -1) {
+            state.apkUrl = a.href || '';
+            state.apkComingSoon = !!a.comingSoon;
+          } else if (label.indexOf('play') !== -1) {
+            state.playUrl = a.href || '';
+            state.playComingSoon = !!a.comingSoon;
+          } else if (label.indexOf('windows') !== -1 || label.indexOf('zip') !== -1) {
+            state.windowsUrl = a.href || '';
+            state.windowsComingSoon = !!a.comingSoon;
+          }
+        });
+      }
+
+      function buildActions(href) {
+        var actions = [];
+        if (href) actions.push({ label: 'View Project', href: href, style: 'primary' });
+        if (state.apkComingSoon || state.apkUrl) {
+          actions.push(state.apkComingSoon || !state.apkUrl
+            ? { label: 'Android APK', style: 'secondary', comingSoon: true }
+            : { label: 'Download APK', href: state.apkUrl, style: 'secondary', download: true });
+        }
+        if (state.playComingSoon || state.playUrl) {
+          actions.push(state.playComingSoon || !state.playUrl
+            ? { label: 'Play Store', style: 'secondary', comingSoon: true }
+            : { label: 'Play Store', href: state.playUrl, style: 'secondary' });
+        }
+        if (state.windowsComingSoon || state.windowsUrl) {
+          actions.push(state.windowsComingSoon || !state.windowsUrl
+            ? { label: 'Windows ZIP', style: 'secondary', comingSoon: true }
+            : { label: 'Windows ZIP', href: state.windowsUrl, style: 'secondary', download: true });
+        }
+        return actions;
+      }
+
+      function shotGrid() {
+        return state.screenshots.map(function (s, i) {
+          return '<div class="media-item"><img src="' + esc(s.src) + '" alt=""><button type="button" class="rm" data-shot="' + i + '">Remove</button></div>';
+        }).join('') || '<p class="muted">No screenshots yet.</p>';
+      }
+
+      function paintForm(p, categories) {
+        p = p || {};
+        state.icon = p.icon || '';
+        state.cover = p.cover || '';
+        state.screenshots = (p.screenshots || []).slice();
+        actionFieldsFrom(p);
+        var catOpts = categories.map(function (c) {
+          return '<option value="' + esc(c.id) + '"' + (p.category === c.id ? ' selected' : '') + '>' + esc(c.label || c.id) + '</option>';
+        }).join('');
+        var plats = p.platforms || [];
+
+        root.innerHTML =
+          '<form class="panel" id="project-form" novalidate>' +
+            '<div class="form-row">' +
+              '<div class="form-group"><label>Title <span class="req">*</span></label><input id="title" required maxlength="80" value="' + esc(p.title || '') + '" /></div>' +
+              '<div class="form-group"><label>Slug / ID <span class="req">*</span></label><input id="id" required ' + (isNew ? '' : 'readonly') + ' value="' + esc(p.id || editId || '') + '" pattern="[a-z0-9-]+" /></div>' +
+            '</div>' +
+            '<div class="form-group"><label>Description <span class="req">*</span></label><textarea id="description" required maxlength="2000">' + esc(p.description || '') + '</textarea></div>' +
+            '<div class="form-row">' +
+              '<div class="form-group"><label>Category <span class="req">*</span></label><select id="category">' + catOpts + '</select></div>' +
+              '<div class="form-group"><label>Status</label><select id="status">' +
+                ['shipped','in-progress','upcoming'].map(function (s) {
+                  return '<option value="' + s + '"' + ((p.status || 'upcoming') === s ? ' selected' : '') + '>' + s + '</option>';
+                }).join('') +
+              '</select></div>' +
+              '<div class="form-group"><label>Detail page href</label><input id="href" value="' + esc(p.href || '') + '" placeholder="asankarobar.html" /></div>' +
+            '</div>' +
+            '<div class="form-group"><label>Platforms</label><div class="checkbox-row">' +
+              ['android','windows','ios','web'].map(function (pl) {
+                return '<label><input type="checkbox" name="platform" value="' + pl + '"' + (plats.indexOf(pl) !== -1 ? ' checked' : '') + '> ' + pl + '</label>';
+              }).join('') +
+            '</div></div>' +
+            '<div class="form-group"><label>Tags (comma-separated)</label><input id="tags" value="' + esc((p.tags || []).join(', ')) + '" /></div>' +
+            '<div class="checkbox-row" style="margin-bottom:1rem">' +
+              '<label><input type="checkbox" id="featured"' + (p.featured ? ' checked' : '') + '> Featured</label>' +
+              '<label><input type="checkbox" id="published"' + (p.published ? ' checked' : '') + '> Published</label>' +
+            '</div>' +
+
+            '<h2 style="font-size:1rem;margin:1rem 0 0.75rem">Media</h2>' +
+            '<div class="form-row">' +
+              '<div class="form-group"><label>Logo</label>' +
+                (state.icon ? '<img class="preview-sm" id="icon-preview" src="' + esc(state.icon) + '" alt="">' : '<span class="muted" id="icon-preview">None</span>') +
+                '<input type="file" id="icon-file" accept="image/jpeg,image/png,image/webp" /></div>' +
+              '<div class="form-group"><label>Cover</label>' +
+                (state.cover ? '<img class="preview-sm" id="cover-preview" src="' + esc(state.cover) + '" alt="">' : '<span class="muted" id="cover-preview">None</span>') +
+                '<input type="file" id="cover-file" accept="image/jpeg,image/png,image/webp" />' +
+                '<input id="cover-class" placeholder="cover CSS class (shot / shot-phone)" value="' + esc(p.coverClass || '') + '" style="margin-top:0.4rem" />' +
+              '</div>' +
+            '</div>' +
+            '<div class="form-group"><label>Screenshots</label><input type="file" id="shot-file" accept="image/jpeg,image/png,image/webp" multiple />' +
+              '<div class="media-grid" id="shot-grid" style="margin-top:0.65rem">' + shotGrid() + '</div></div>' +
+
+            '<h2 style="font-size:1rem;margin:1rem 0 0.75rem">Downloads</h2>' +
+            '<div class="form-row">' +
+              '<div class="form-group"><label>APK URL or upload</label><input id="apk-url" value="' + esc(state.apkUrl) + '" /><input type="file" id="apk-file" accept=".apk,application/vnd.android.package-archive" />' +
+                '<label style="margin-top:0.35rem"><input type="checkbox" id="apk-soon"' + (state.apkComingSoon ? ' checked' : '') + '> Coming Soon</label></div>' +
+              '<div class="form-group"><label>Play Store URL</label><input id="play-url" type="url" value="' + esc(state.playUrl) + '" />' +
+                '<label style="margin-top:0.35rem"><input type="checkbox" id="play-soon"' + (state.playComingSoon ? ' checked' : '') + '> Coming Soon</label></div>' +
+              '<div class="form-group"><label>Windows ZIP URL or upload</label><input id="win-url" value="' + esc(state.windowsUrl) + '" /><input type="file" id="win-file" accept=".zip,application/zip" />' +
+                '<label style="margin-top:0.35rem"><input type="checkbox" id="win-soon"' + (state.windowsComingSoon ? ' checked' : '') + '> Coming Soon</label></div>' +
+            '</div>' +
+
+            '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1rem">' +
+              '<button type="submit" class="btn btn-primary" id="save-btn">Save project</button>' +
+              '<a class="btn btn-secondary" href="projects.html">Cancel</a>' +
+            '</div>' +
+          '</form>';
+
+        document.getElementById('title').addEventListener('input', function () {
+          if (!isNew) return;
+          var idEl = document.getElementById('id');
+          if (!idEl.dataset.touched) idEl.value = ABSAdmin.slugify(this.value);
+        });
+        document.getElementById('id').addEventListener('input', function () { this.dataset.touched = '1'; });
+
+        document.getElementById('shot-grid').addEventListener('click', function (e) {
+          var b = e.target.closest('[data-shot]');
+          if (!b) return;
+          state.screenshots.splice(Number(b.getAttribute('data-shot')), 1);
+          document.getElementById('shot-grid').innerHTML = shotGrid();
+        });
+
+        async function upImage(fileInput, folder, onUrl) {
+          var file = fileInput.files && fileInput.files[0];
+          if (!file) return;
+          var err = ABSAdmin.validateImage(file);
+          if (err) { ABSAdmin.toast(err, 'err'); fileInput.value = ''; return; }
+          var pid = document.getElementById('id').value.trim() || 'draft';
+          ABSAdmin.toast('Uploading…');
+          try {
+            var res = await ABSAdmin.uploadProjectFile(ctx.storage, pid, folder, file);
+            onUrl(res.url);
+            ABSAdmin.toast('Uploaded', 'ok');
+          } catch (e) {
+            ABSAdmin.toast(e.message || 'Upload failed', 'err');
+          }
+          fileInput.value = '';
+        }
+
+        document.getElementById('icon-file').addEventListener('change', function () {
+          upImage(this, 'icon', function (url) {
+            state.icon = url;
+            var prev = document.getElementById('icon-preview');
+            prev.outerHTML = '<img class="preview-sm" id="icon-preview" src="' + esc(url) + '" alt="">';
+          });
+        });
+        document.getElementById('cover-file').addEventListener('change', function () {
+          upImage(this, 'cover', function (url) {
+            state.cover = url;
+            var prev = document.getElementById('cover-preview');
+            prev.outerHTML = '<img class="preview-sm" id="cover-preview" src="' + esc(url) + '" alt="">';
+          });
+        });
+        document.getElementById('shot-file').addEventListener('change', async function () {
+          var files = Array.prototype.slice.call(this.files || []);
+          var pid = document.getElementById('id').value.trim() || 'draft';
+          for (var i = 0; i < files.length; i++) {
+            var err = ABSAdmin.validateImage(files[i]);
+            if (err) { ABSAdmin.toast(err, 'err'); continue; }
+            try {
+              var res = await ABSAdmin.uploadProjectFile(ctx.storage, pid, 'screenshots', files[i]);
+              state.screenshots.push({ src: res.url, alt: files[i].name, caption: files[i].name.replace(/\.[^.]+$/, '') });
+            } catch (e) { ABSAdmin.toast(e.message || 'Upload failed', 'err'); }
+          }
+          document.getElementById('shot-grid').innerHTML = shotGrid();
+          this.value = '';
+        });
+
+        async function upDownload(fileInput, onUrl) {
+          var file = fileInput.files && fileInput.files[0];
+          if (!file) return;
+          var err = ABSAdmin.validateDownload(file);
+          if (err) { ABSAdmin.toast(err, 'err'); fileInput.value = ''; return; }
+          var pid = document.getElementById('id').value.trim() || 'draft';
+          try {
+            var res = await ABSAdmin.uploadProjectFile(ctx.storage, pid, 'downloads', file);
+            onUrl(res.url);
+            ABSAdmin.toast('Upload complete', 'ok');
+          } catch (e) { ABSAdmin.toast(e.message || 'Upload failed', 'err'); }
+          fileInput.value = '';
+        }
+        document.getElementById('apk-file').addEventListener('change', function () {
+          upDownload(this, function (url) {
+            state.apkUrl = url;
+            document.getElementById('apk-url').value = url;
+            document.getElementById('apk-soon').checked = false;
+          });
+        });
+        document.getElementById('win-file').addEventListener('change', function () {
+          upDownload(this, function (url) {
+            state.windowsUrl = url;
+            document.getElementById('win-url').value = url;
+            document.getElementById('win-soon').checked = false;
+          });
+        });
+
+        document.getElementById('project-form').addEventListener('submit', function (e) {
+          e.preventDefault();
+          state.apkUrl = document.getElementById('apk-url').value.trim();
+          state.playUrl = document.getElementById('play-url').value.trim();
+          state.windowsUrl = document.getElementById('win-url').value.trim();
+          state.apkComingSoon = document.getElementById('apk-soon').checked;
+          state.playComingSoon = document.getElementById('play-soon').checked;
+          state.windowsComingSoon = document.getElementById('win-soon').checked;
+
+          var platforms = Array.prototype.map.call(document.querySelectorAll('input[name="platform"]:checked'), function (el) { return el.value; });
+          var href = document.getElementById('href').value.trim();
+          var payload = {
+            id: document.getElementById('id').value.trim(),
+            title: document.getElementById('title').value,
+            description: document.getElementById('description').value,
+            category: document.getElementById('category').value,
+            status: document.getElementById('status').value,
+            href: href,
+            platforms: platforms,
+            tagsText: document.getElementById('tags').value,
+            featured: document.getElementById('featured').checked,
+            published: document.getElementById('published').checked,
+            icon: state.icon,
+            cover: state.cover,
+            coverClass: document.getElementById('cover-class').value.trim() || 'shot',
+            screenshots: state.screenshots,
+            actions: buildActions(href)
+          };
+
+          var btn = document.getElementById('save-btn');
+          btn.disabled = true;
+          try {
+            var doc = ABSAdmin.normalizeProject(payload, p);
+            ABSAdmin.saveProject(ctx.db, doc, isNew).then(function () {
+              ABSAdmin.toast('Saved', 'ok');
+              location.href = 'project-edit.html?id=' + encodeURIComponent(doc.id);
+            }).catch(function (err) {
+              ABSAdmin.toast(err.message || 'Save failed', 'err');
+              btn.disabled = false;
+            });
+          } catch (err) {
+            ABSAdmin.toast(err.message, 'err');
+            btn.disabled = false;
+          }
+        });
+      }
+
+      Promise.all([
+        isNew ? Promise.resolve(null) : ABSAdmin.getProject(ctx.db, editId),
+        ctx.db.collection('categories').get()
+      ]).then(function (res) {
+        var project = res[0];
+        if (!isNew && !project) {
+          root.innerHTML = '<div class="alert alert-error">Project not found.</div>';
+          return;
+        }
+        var categories = res[1].docs.map(function (d) {
+          var data = d.data();
+          data.id = d.id;
+          return data;
+        });
+        if (!categories.length) {
+          categories = [
+            { id: 'business', label: 'Business' },
+            { id: 'lifestyle', label: 'Lifestyle' },
+            { id: 'upcoming', label: 'Upcoming' }
+          ];
+        }
+        paintForm(project, categories);
+      }).catch(function (err) {
+        root.innerHTML = '<div class="alert alert-error">' + esc(err.message) + '</div>';
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Categories — Admin</title>
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <div class="admin-app" id="admin-app"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/firebase-init.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin-shell.js"></script>
+  <script>
+    function esc(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    ABSAdmin.requireAdmin().then(function (ctx) {
+      ABSAdmin.mountShell('categories', 'Categories', ctx.user.email);
+      var root = document.getElementById('admin-content');
+
+      function load() {
+        Promise.all([
+          ctx.db.collection('categories').get(),
+          ctx.db.collection('projects').get()
+        ]).then(function (res) {
+          var usage = {};
+          res[1].docs.forEach(function (d) {
+            var c = d.data().category;
+            if (c) usage[c] = (usage[c] || 0) + 1;
+          });
+          var rows = res[0].docs.map(function (d) {
+            var data = d.data();
+            var count = usage[d.id] || 0;
+            return '<tr data-id="' + esc(d.id) + '">' +
+              '<td>' + esc(d.id) + '</td>' +
+              '<td>' + esc(data.label || d.id) + '</td>' +
+              '<td>' + count + '</td>' +
+              '<td><button type="button" class="btn btn-danger btn-sm" data-del="1" ' + (count ? 'disabled title="In use"' : '') + '>Delete</button></td>' +
+              '</tr>';
+          }).join('') || '<tr><td colspan="4" class="empty">No categories. Seed defaults below.</td></tr>';
+
+          root.innerHTML =
+            '<div class="panel">' +
+              '<div class="panel-head"><h2>Categories</h2></div>' +
+              '<form id="add-form" class="toolbar">' +
+                '<input id="cat-id" placeholder="id (e.g. business)" pattern="[a-z0-9-]+" required style="max-width:180px" />' +
+                '<input id="cat-label" placeholder="Label" required style="max-width:180px" />' +
+                '<button class="btn btn-primary btn-sm" type="submit">Add</button>' +
+                '<button class="btn btn-secondary btn-sm" type="button" id="seed-cats">Seed defaults</button>' +
+              '</form>' +
+              '<div class="table-wrap"><table class="data"><thead><tr><th>ID</th><th>Label</th><th>Projects</th><th></th></tr></thead><tbody id="tbody">' + rows + '</tbody></table></div>' +
+            '</div>';
+
+          document.getElementById('add-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            var id = document.getElementById('cat-id').value.trim().toLowerCase();
+            var label = document.getElementById('cat-label').value.trim();
+            if (!/^[a-z0-9-]+$/.test(id) || !label) {
+              ABSAdmin.toast('Valid id and label required', 'err');
+              return;
+            }
+            ctx.db.collection('categories').doc(id).set({ label: label, updatedAt: firebase.firestore.FieldValue.serverTimestamp() })
+              .then(function () { ABSAdmin.toast('Added', 'ok'); load(); })
+              .catch(function (err) { ABSAdmin.toast(err.message, 'err'); });
+          });
+
+          document.getElementById('seed-cats').addEventListener('click', function () {
+            var batch = ctx.db.batch();
+            [
+              { id: 'business', label: 'Business' },
+              { id: 'lifestyle', label: 'Lifestyle' },
+              { id: 'upcoming', label: 'Upcoming' }
+            ].forEach(function (c) {
+              batch.set(ctx.db.collection('categories').doc(c.id), {
+                label: c.label,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+              }, { merge: true });
+            });
+            batch.commit().then(function () { ABSAdmin.toast('Defaults seeded', 'ok'); load(); });
+          });
+
+          document.getElementById('tbody').addEventListener('click', function (e) {
+            var btn = e.target.closest('[data-del]');
+            if (!btn || btn.disabled) return;
+            var id = btn.closest('tr').getAttribute('data-id');
+            if (!confirm('Delete category "' + id + '"?')) return;
+            ctx.db.collection('categories').doc(id).delete()
+              .then(function () { ABSAdmin.toast('Deleted', 'ok'); load(); })
+              .catch(function (err) { ABSAdmin.toast(err.message, 'err'); });
+          });
+        });
+      }
+
+      load();
+    });
+  </script>
+</body>
+</html>

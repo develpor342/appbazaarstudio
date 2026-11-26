@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Dashboard — Admin</title>
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <div class="admin-app" id="admin-app"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/firebase-init.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin-shell.js"></script>
+  <script src="js/projects-api.js"></script>
+  <script>
+    ABSAdmin.requireAdmin().then(function (ctx) {
+      ABSAdmin.mountShell('dashboard', 'Dashboard', ctx.user.email);
+      var root = document.getElementById('admin-content');
+      root.innerHTML = '<p class="muted">Loading overview…</p>';
+
+      Promise.all([
+        ABSAdmin.listProjects(ctx.db).catch(function () { return []; }),
+        ctx.db.collection('inquiries').where('read', '==', false).get().catch(function () { return { size: 0 }; })
+      ]).then(function (res) {
+        var projects = res[0] || [];
+        var unread = res[1].size || 0;
+        var published = projects.filter(function (p) { return p.published; }).length;
+        var drafts = projects.length - published;
+        var featured = projects.filter(function (p) { return p.featured; }).length;
+        var upcoming = projects.filter(function (p) { return p.status === 'upcoming'; }).length;
+
+        var recent = projects.slice(0, 6).map(function (p) {
+          return '<tr>' +
+            '<td>' + escapeHtml(p.title) + '</td>' +
+            '<td><span class="badge">' + escapeHtml(p.category || '') + '</span></td>' +
+            '<td>' + (p.published ? '<span class="badge badge-ok">Published</span>' : '<span class="badge badge-warn">Draft</span>') + '</td>' +
+            '<td><a class="btn btn-secondary btn-sm" href="project-edit.html?id=' + encodeURIComponent(p.id) + '">Edit</a></td>' +
+            '</tr>';
+        }).join('') || '<tr><td colspan="4" class="empty">No projects yet — create one.</td></tr>';
+
+        root.innerHTML =
+          '<div class="stats">' +
+            '<div class="stat-card"><div class="n">' + projects.length + '</div><div class="l">Projects</div></div>' +
+            '<div class="stat-card"><div class="n">' + published + '</div><div class="l">Published</div></div>' +
+            '<div class="stat-card"><div class="n">' + drafts + '</div><div class="l">Drafts</div></div>' +
+            '<div class="stat-card"><div class="n">' + featured + '</div><div class="l">Featured</div></div>' +
+            '<div class="stat-card"><div class="n">' + upcoming + '</div><div class="l">Upcoming</div></div>' +
+            '<div class="stat-card"><div class="n">' + unread + '</div><div class="l">Unread messages</div></div>' +
+          '</div>' +
+          '<div class="panel">' +
+            '<div class="panel-head"><h2>Recent projects</h2>' +
+              '<div style="display:flex;gap:0.5rem;flex-wrap:wrap">' +
+                '<a class="btn btn-secondary btn-sm" href="seed.html">Seed from JSON</a>' +
+                '<a class="btn btn-primary btn-sm" href="project-edit.html">Create project</a>' +
+              '</div>' +
+            '</div>' +
+            '<div class="table-wrap"><table class="data"><thead><tr><th>Title</th><th>Category</th><th>Status</th><th></th></tr></thead><tbody>' +
+            recent + '</tbody></table></div>' +
+          '</div>';
+      });
+    });
+
+    function escapeHtml(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>

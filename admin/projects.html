@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Projects — Admin</title>
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <div class="admin-app" id="admin-app"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/firebase-init.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin-shell.js"></script>
+  <script src="js/projects-api.js"></script>
+  <script>
+    function esc(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    ABSAdmin.requireAdmin().then(function (ctx) {
+      ABSAdmin.mountShell('projects', 'Projects', ctx.user.email);
+      var root = document.getElementById('admin-content');
+      var all = [];
+
+      function render() {
+        var q = (document.getElementById('q') && document.getElementById('q').value || '').toLowerCase().trim();
+        var status = document.getElementById('f-status').value;
+        var cat = document.getElementById('f-cat').value;
+        var rows = all.filter(function (p) {
+          if (status === 'published' && !p.published) return false;
+          if (status === 'draft' && p.published) return false;
+          if (status === 'upcoming' && p.status !== 'upcoming') return false;
+          if (cat !== 'all' && p.category !== cat) return false;
+          if (q && (p.search || p.title || '').toLowerCase().indexOf(q) === -1) return false;
+          return true;
+        });
+
+        var body = rows.map(function (p) {
+          return '<tr data-id="' + esc(p.id) + '">' +
+            '<td>' + (p.icon ? '<img class="preview-sm" src="' + esc(p.icon) + '" alt="">' : '') + '</td>' +
+            '<td><strong>' + esc(p.title) + '</strong><div class="muted" style="font-size:0.75rem">' + esc(p.id) + '</div></td>' +
+            '<td>' + esc(p.category) + '</td>' +
+            '<td>' + esc((p.platforms || []).join(', ')) + '</td>' +
+            '<td>' + esc(p.status) + '</td>' +
+            '<td>' + (p.featured ? 'Yes' : '—') + '</td>' +
+            '<td>' + (p.published ? '<span class="badge badge-ok">Published</span>' : '<span class="badge badge-warn">Draft</span>') + '</td>' +
+            '<td style="white-space:nowrap">' +
+              '<a class="btn btn-secondary btn-sm" href="project-edit.html?id=' + encodeURIComponent(p.id) + '">Edit</a> ' +
+              '<button type="button" class="btn btn-secondary btn-sm" data-pub="' + (p.published ? '0' : '1') + '">' + (p.published ? 'Unpublish' : 'Publish') + '</button> ' +
+              '<button type="button" class="btn btn-danger btn-sm" data-del="1">Delete</button>' +
+            '</td></tr>';
+        }).join('') || '<tr><td colspan="8" class="empty">No projects match.</td></tr>';
+
+        document.getElementById('tbody').innerHTML = body;
+      }
+
+      root.innerHTML =
+        '<div class="panel">' +
+          '<div class="panel-head"><h2>All projects</h2><a class="btn btn-primary btn-sm" href="project-edit.html">Create project</a></div>' +
+          '<div class="toolbar">' +
+            '<input type="search" id="q" placeholder="Search…" style="max-width:220px" />' +
+            '<select id="f-status"><option value="all">All publish states</option><option value="published">Published</option><option value="draft">Draft</option><option value="upcoming">Upcoming</option></select>' +
+            '<select id="f-cat"><option value="all">All categories</option></select>' +
+          '</div>' +
+          '<div class="table-wrap"><table class="data"><thead><tr>' +
+            '<th></th><th>Title</th><th>Category</th><th>Platforms</th><th>Status</th><th>Featured</th><th>Publish</th><th>Actions</th>' +
+          '</tr></thead><tbody id="tbody"></tbody></table></div>' +
+        '</div>';
+
+      ['q', 'f-status', 'f-cat'].forEach(function (id) {
+        document.getElementById(id).addEventListener('input', render);
+        document.getElementById(id).addEventListener('change', render);
+      });
+
+      document.getElementById('tbody').addEventListener('click', function (e) {
+        var btn = e.target.closest('button');
+        if (!btn) return;
+        var tr = btn.closest('tr');
+        var id = tr && tr.getAttribute('data-id');
+        if (!id) return;
+        if (btn.getAttribute('data-del')) {
+          if (!confirm('Delete "' + id + '"? This cannot be undone.')) return;
+          ABSAdmin.deleteProject(ctx.db, id).then(function () {
+            all = all.filter(function (p) { return p.id !== id; });
+            ABSAdmin.toast('Deleted', 'ok');
+            render();
+          }).catch(function (err) { ABSAdmin.toast(err.message, 'err'); });
+        }
+        if (btn.hasAttribute('data-pub')) {
+          var pub = btn.getAttribute('data-pub') === '1';
+          ABSAdmin.setPublished(ctx.db, id, pub).then(function () {
+            all.forEach(function (p) { if (p.id === id) p.published = pub; });
+            ABSAdmin.toast(pub ? 'Published' : 'Unpublished', 'ok');
+            render();
+          }).catch(function (err) { ABSAdmin.toast(err.message, 'err'); });
+        }
+      });
+
+      Promise.all([
+        ABSAdmin.listProjects(ctx.db),
+        ctx.db.collection('categories').get()
+      ]).then(function (res) {
+        all = res[0];
+        var catSel = document.getElementById('f-cat');
+        res[1].docs.forEach(function (d) {
+          var opt = document.createElement('option');
+          opt.value = d.id;
+          opt.textContent = (d.data().label || d.id);
+          catSel.appendChild(opt);
+        });
+        render();
+      }).catch(function (err) {
+        root.innerHTML = '<div class="alert alert-error">' + esc(err.message) + '</div>';
+      });
+    });
+  </script>
+</body>
+</html>

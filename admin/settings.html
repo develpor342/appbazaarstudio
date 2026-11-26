@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Settings — Admin</title>
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <div class="admin-app" id="admin-app"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/firebase-init.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin-shell.js"></script>
+  <script>
+    ABSAdmin.requireAdmin().then(function (ctx) {
+      ABSAdmin.mountShell('settings', 'Settings', ctx.user.email);
+      var root = document.getElementById('admin-content');
+      var ref = ctx.db.collection('settings').doc('site');
+
+      ref.get().then(function (snap) {
+        var s = snap.exists ? snap.data() : {};
+        root.innerHTML =
+          '<form class="panel" id="settings-form">' +
+            '<div class="alert alert-info">Leave social / ads fields empty until genuine values are available. Do not invent URLs or publisher IDs.</div>' +
+            '<div class="form-group"><label>Studio email</label><input id="email" type="email" value="' + (s.email || 'asankarobar.officials@gmail.com') + '" /></div>' +
+            '<div class="form-group"><label>WhatsApp URL</label><input id="whatsapp" type="url" value="' + (s.whatsapp || '') + '" placeholder="Leave empty" /></div>' +
+            '<div class="form-group"><label>LinkedIn URL</label><input id="linkedin" type="url" value="' + (s.linkedin || '') + '" placeholder="Leave empty" /></div>' +
+            '<div class="form-group"><label>GitHub URL</label><input id="github" type="url" value="' + (s.github || '') + '" placeholder="Leave empty" /></div>' +
+            '<div class="form-group"><label>app-ads.txt line</label><input id="appAdsLine" value="' + (s.appAdsLine || '') + '" placeholder="Leave empty until real publisher ID" /></div>' +
+            '<button type="submit" class="btn btn-primary">Save settings</button>' +
+          '</form>';
+
+        document.getElementById('settings-form').addEventListener('submit', function (e) {
+          e.preventDefault();
+          ref.set({
+            email: document.getElementById('email').value.trim(),
+            whatsapp: document.getElementById('whatsapp').value.trim(),
+            linkedin: document.getElementById('linkedin').value.trim(),
+            github: document.getElementById('github').value.trim(),
+            appAdsLine: document.getElementById('appAdsLine').value.trim(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true }).then(function () {
+            ABSAdmin.toast('Settings saved', 'ok');
+          }).catch(function (err) {
+            ABSAdmin.toast(err.message, 'err');
+          });
+        });
+      });
+    });
+  </script>
+</body>
+</html>
