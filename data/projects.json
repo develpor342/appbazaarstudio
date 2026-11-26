@@ -20,7 +20,7 @@
       "coverHeight": 450,
       "actions": [
         { "label": "View Project", "href": "asankarobar.html", "style": "primary" },
-        { "label": "Download APK v1.0.8", "href": "downloads/asan-karobar-1.0.8.apk?v=108", "style": "secondary", "download": true },
+        { "label": "Download APK v1.0.8", "href": "downloads/asan-karobar-1.0.8.apk?v=109", "style": "secondary", "download": true },
         { "label": "Windows ZIP", "href": "downloads/AsanKarobar_Windows_1.0.6.zip", "style": "secondary", "download": true }
       ]
     },
